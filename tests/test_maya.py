@@ -308,10 +308,13 @@ def main():
     far = joint.far_frame
     body = bodies.find_body(nodes, joint.body_a_name)
 
+    # Moved and nothing else: the signature covers the joint's placement, so this
+    # alone has to count as an edit or frame A would keep its old position.
     scene.nodes[mover].matrix[12] += 3.0
-    scene.nodes[bake_module._constraint_under(mover)].attrs["angularConstraintMaxX"] += 1.0
 
-    bake_module.bake(nodes)
+    baked = bake_module.bake(nodes)
+    check("R4: moving a joint alone counts as an edit", baked.rewritten >= 1,
+          str(baked))
 
     import maya.api.OpenMaya as om
     joint_world = om.MMatrix(scene.nodes[mover].matrix)

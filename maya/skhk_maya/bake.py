@@ -46,7 +46,7 @@ def bake(nodes=None):
         joint = Joint(node)
         current = _read(constraint, joint)
 
-        if _stored_signature(node) == limits.signature(current):
+        if _stored_signature(node) == limits.signature(current, _frame_of(node)):
             result.unchanged += 1
             continue
 
@@ -60,7 +60,8 @@ def bake(nodes=None):
         _write_limits(node, joint, dict(current))
         _write_far_frame(node, joint, pool, result)
 
-        _remember(node, limits.signature(_read(_constraint_under(node), joint)))
+        _remember(node, limits.signature(_read(_constraint_under(node), joint),
+                                         _frame_of(node)))
         result.rewritten += 1
 
     return result
@@ -259,6 +260,14 @@ def _write_far_frame(node, joint, pool, result):
 
 
 # --- attribute plumbing ----------------------------------------------------
+
+
+def _frame_of(node):
+    """The joint's own placement, for the signature. See limits.signature."""
+    try:
+        return cmds.xform(node, query=True, matrix=True, worldSpace=True)
+    except (RuntimeError, ValueError):
+        return None
 
 
 def _constraint_under(node):

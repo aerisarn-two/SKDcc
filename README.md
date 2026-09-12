@@ -1,7 +1,18 @@
 # Skyrim Havok Constraints
 
-A Blender add-on that turns the Havok ragdoll in a NIFBX or HKFBX export into
-constraints Blender can actually use, and writes them back when you are done.
+Per-host scripts that turn the Havok ragdoll in a NIFBX or HKFBX export into
+constraints the DCC can actually use, and write them back when you are done.
+
+| | | Verified |
+| --- | --- | --- |
+| [`blender/`](blender) | add-on, `RigidBodyConstraint` + `LIMIT_ROTATION` | in Blender 5.0.1 |
+| [`maya/`](maya) | `maya.cmds`, Bullet six-DOF + `transformLimits` | fixture only |
+| [`max/`](max) | `pymxs`, MassFX `UConstraint` + rotation limits | fixture only |
+
+Only the Blender add-on has been run in its host. Maya and Max are tested against
+a fixture taken off a real ragdoll with a recording stand-in for the host API,
+which catches a wrong property name, enum, unit or axis and cannot catch the
+host's own semantics. Each README says what to check first.
 
 ## Why it exists
 
@@ -13,17 +24,19 @@ none of which is a joint limit. ck-cmd wrote that route and commented it out.
 
 So [NIFBX](https://github.com/aerisarn-two/NIFBX) and HKFBX carry the ragdoll as
 properties on empty objects instead, and the translation happens at each end.
-This add-on is the Blender end. The reasoning, the measurements and the rules it
-implements are in `docs/dcc-constraint-interop-spec.md` in NIFBX.
+These are those ends. The reasoning, the measurements and the rules they
+implement are in `docs/dcc-constraint-interop-spec.md` in NIFBX.
 
-The payoff is that inside Blender the link between two bodies is an **object
-pointer**, not a name. Rename every body in the scene and nothing breaks; on the
-way out the names are regenerated from the pointers. That retires the
-63-character truncation that costs 19% of vanilla joint names their second half.
+The payoff is that inside the DCC the link between two bodies is a **reference** —
+a Blender pointer, a Maya connection, a Max node reference — not a name. Rename
+every body in the scene and nothing breaks; on the way out the names are
+regenerated from the references. That retires the 63-character truncation that
+costs 19% of vanilla joint names their second half.
 
-## What it does
+## What they do
 
-Two paths, because two people want this and they want different things.
+Two paths in each host, because two people want this and they want different
+things.
 
 **Ragdoll (physics)** — `Properties ▸ Physics ▸ Build Rigid Body Constraints`.
 Gives every collision shape a Blender rigid body with its Havok mass, friction,
@@ -61,7 +74,7 @@ stiff spring's stiffness, a chain's links, a wrapper's breaking threshold: the
 `hkc_` dump is what makes a NIF round trip byte-exact, and it is not this
 add-on's to rewrite.
 
-## Installing
+## Installing (Blender)
 
 Blender 4.2 or newer. `Edit ▸ Preferences ▸ Add-ons ▸ Install from Disk`, and
 pick the `skyrim_havok_constraints` folder zipped, or drop the folder into your

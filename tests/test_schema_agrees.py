@@ -15,8 +15,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 
 COPIES = (
-    os.path.join(ROOT, "blender", "skyrim_havok_constraints", "schema.py"),
-    os.path.join(ROOT, "maya", "skhk_maya", "schema.py"),
+    ("blender", os.path.join(ROOT, "blender", "skyrim_havok_constraints", "schema.py")),
+    ("maya", os.path.join(ROOT, "maya", "skhk_maya", "schema.py")),
+    ("max", os.path.join(ROOT, "max", "skhk_max", "schema.py")),
 )
 
 
@@ -39,25 +40,32 @@ def constants(path):
 
 
 def main():
-    blender, maya = (constants(path) for path in COPIES)
+    copies = [(host, constants(path)) for host, path in COPIES]
     failures = []
 
-    # SHAPE_SUFFIXES maps to each host's own collider enum, so only its keys are
-    # shared. Everything else has to match outright.
-    shared = (set(blender) | set(maya)) - {"SHAPE_SUFFIXES"}
+    # Every constant is shared, SHAPE_SUFFIXES included: each host maps its
+    # neutral tokens to its own enum, but the suffix table itself is one table.
+    every = set()
+    for _, found in copies:
+        every |= set(found)
 
-    for name in sorted(shared):
-        if name not in blender:
-            failures.append("%s is only in the Maya copy" % name)
-        elif name not in maya:
-            failures.append("%s is only in the Blender copy" % name)
-        elif blender[name] != maya[name]:
-            failures.append("%s differs: %r against %r" % (name, blender[name], maya[name]))
+    reference_host, reference = copies[0]
 
-    keys_b = [suffix for suffix, _ in blender.get("SHAPE_SUFFIXES", ())]
-    print("%-4s %d shared constants agree" % ("FAIL" if failures else "PASS", len(shared)))
-    print("%-4s the shape suffixes are the same, in the same order"
-          % ("PASS" if keys_b else "FAIL"))
+    for name in sorted(every):
+        for host, found in copies[1:]:
+            if name not in found:
+                failures.append("%s is missing from the %s copy" % (name, host))
+            elif name not in reference:
+                failures.append("%s is missing from the %s copy" % (name, reference_host))
+            elif found[name] != reference[name]:
+                failures.append("%s differs between %s and %s: %r against %r"
+                                % (name, reference_host, host,
+                                   reference[name], found[name]))
+
+    print("%-4s %d constants agree across %d hosts"
+          % ("FAIL" if failures else "PASS", len(every), len(copies)))
+    print("%-4s the shape suffixes are one table, in one order"
+          % ("PASS" if not failures and "SHAPE_SUFFIXES" in reference else "FAIL"))
 
     for problem in failures:
         print("   ", problem)

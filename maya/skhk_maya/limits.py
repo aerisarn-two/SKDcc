@@ -126,12 +126,21 @@ def plan(joint):
     return settings
 
 
-def signature(values):
+def signature(values, frame=None):
     """A fingerprint of the values a build wrote, for spec R2.
 
     Takes the already-read numbers rather than a node, so the same format is
     produced whether it is being made at build time or compared at bake time.
+
+    The joint's own placement is part of it when given. Moving the joint moves the
+    frame, and frame A has to be rewritten for that as surely as for a changed
+    limit -- without it, a joint that was dragged somewhere new keeps the frame A
+    it had in its old position and the ragdoll is quietly wrong.
     """
-    return "|".join("%s=%.7g" % (name, value) if isinstance(value, float)
-                    else "%s=%s" % (name, value)
-                    for name, value in values)
+    parts = ["%s=%.7g" % (name, value) if isinstance(value, float)
+             else "%s=%s" % (name, value) for name, value in values]
+
+    if frame is not None:
+        parts.extend("%.5g" % value for value in frame)
+
+    return "|".join(parts)

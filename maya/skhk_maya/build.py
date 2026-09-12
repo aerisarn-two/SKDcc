@@ -100,7 +100,7 @@ def build_rigid_body_constraints(nodes=None, dynamic=False):
             continue
 
         written = _apply(existing, joint)
-        _remember(node, limits.signature(written))
+        _remember(node, limits.signature(written, _frame_of(node)))
         result.built += 1
 
     return result
@@ -126,6 +126,14 @@ def _apply(constraint, joint):
         written.append((attribute, value))
 
     return written
+
+
+def _frame_of(node):
+    """The joint's own placement, for the signature. See limits.signature."""
+    try:
+        return cmds.xform(node, query=True, matrix=True, worldSpace=True)
+    except (RuntimeError, ValueError):
+        return None
 
 
 def _constraint_under(node):

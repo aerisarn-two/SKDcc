@@ -51,7 +51,7 @@ RB_LINEAR_DAMPING = "nif_rb_linear_damping"
 RB_ANGULAR_DAMPING = "nif_rb_angular_damping"
 RB_LAYER = "nif_rb_layer"
 
-#: Written by this add-on, never by the exporters: a fingerprint of the values
+#: Written by these scripts, never by the exporters: a fingerprint of the values
 #: it put on the native constraint, so a later bake can tell an untouched
 #: constraint from an edited one. See spec R2.
 SIGNATURE = "skhk_signature"
@@ -90,3 +90,9 @@ def field(name):
     """The property a nif.xml field is stored under: ``Cone Max Angle`` ->
     ``hkc_cone_max_angle``. The same transform ``NifFieldCodec.Key`` applies."""
     return FIELD_PREFIX + name.replace(" ", "_").lower()
+
+
+#: The midpoint a swing limit was centred on, in radians, when Max's symmetric
+#: Swing had to stand in for an asymmetric Havok range. Written by the Max script
+#: only, and the thing that makes the approximation invertible.
+SWING_OFFSET = "skhk_swing_offset"

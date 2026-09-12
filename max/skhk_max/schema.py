@@ -3,6 +3,16 @@
 Mirror of ``FbxConstraintWriter`` and ``FbxSkeletonWriter``. Nothing here is
 guessed: every name was read out of a real export, and the spec that defines
 them is ``dcc-constraint-interop-spec.md`` in NIFBX.
+
+Kept byte-identical to the other hosts' copies rather than shared, because a
+Blender add-on has to be a self-contained folder and a Maya or Max script has to
+be importable from a scripts path; none of them can reach a sibling package.
+``tests/test_schema_agrees.py`` fails if the copies drift apart.
+
+The names are already legal identifiers. NIFBX escapes a space as ``_s_``,
+brackets as ``_ob_``/``_cb_`` and a colon as ``_dd_`` (``NameEncoding``), so
+``NPC L Forearm [LLar]`` arrives as ``NPC_s_L_s_Forearm_s__ob_LLar_cb_`` -- and
+the body properties carry the escaped spelling, so they match the node names.
 """
 
 # --- the shared convention -------------------------------------------------

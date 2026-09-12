@@ -1,22 +1,39 @@
 #!/usr/bin/env bash
-# The add-on against a real creature ragdoll, headless.
+# Everything that can be run on this machine.
 #
-#   tests/run.sh path/to/skeleton.fbx
+#   tests/run.sh [path/to/skeleton.fbx]
 #
-# Any FBX written by NIFBX from a creature's skeleton.nif, or by HKFBX from a
-# skeleton.hkx, will do. There is no bundled fixture: the point of the suite is
-# that it runs against files nobody wrote for a test.
+# Without an FBX, the host-free suites run: the Maya scripts against a recorded
+# fixture, and the check that the two schema copies have not drifted. With one,
+# the Blender add-on runs inside Blender as well.
 #
-# --factory-startup is deliberately NOT passed. It leaves io_scene_fbx's
-# operator properties unregistered, and the exporter then dies with
+# --factory-startup is deliberately NOT passed to Blender. It leaves
+# io_scene_fbx's operator properties unregistered and the exporter then dies with
 # "'ExportFBX' object has no attribute 'use_space_transform'".
-set -euo pipefail
+set -uo pipefail
 
-fbx="${1:?usage: tests/run.sh path/to/skeleton.fbx}"
-blender="${SKHK_BLENDER:-blender}"
 here="$(cd "$(dirname "$0")" && pwd)"
+blender="${SKHK_BLENDER:-blender}"
+failures=0
 
-"$blender" --background --python "$here/run_in_blender.py" -- "$fbx" 2>&1 \
-    | grep -E '^(PASS|FAIL|     )|checks failed|FAILED:'
+echo "== schema =="
+python3 "$here/test_schema_agrees.py" || failures=$((failures + $?))
 
-exit "${PIPESTATUS[0]}"
+echo
+echo "== maya (fixture, no Maya needed) =="
+python3 "$here/test_maya.py" || failures=$((failures + $?))
+
+if [ "$#" -ge 1 ]; then
+    echo
+    echo "== blender (live) =="
+    "$blender" --background --python "$here/run_in_blender.py" -- "$1" 2>&1 \
+        | grep -E '^(PASS|FAIL|     )|checks failed|FAILED:'
+    failures=$((failures + ${PIPESTATUS[0]}))
+else
+    echo
+    echo "== blender: skipped, pass an FBX to run it =="
+fi
+
+echo
+echo "$failures failure(s)"
+exit "$failures"

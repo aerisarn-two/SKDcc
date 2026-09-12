@@ -1,0 +1,2610 @@
+{
+ "bodies": {
+  "LFemur_rb": {
+   "bone": "LFemur",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "10",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.15",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "LFemur_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999997913837433,
+    0.009999996982514858
+   ]
+  },
+  "LLargeCannon_rb": {
+   "bone": "LLargeCannon",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "5.9999995",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06094086",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "LLargeCannon_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999996982514858,
+    0.009999996051192284
+   ]
+  },
+  "LPhalanxPrima_rb": {
+   "bone": "LPhalanxPrima",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "4.9999995",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.04695839",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "LPhalanxPrima_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999997913837433,
+    0.009999996982514858
+   ]
+  },
+  "LTibia_rb": {
+   "bone": "LTibia",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "7.999999",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.083070956",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "LTibia_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999997913837433,
+    0.009999997913837433,
+    0.009999995119869709
+   ]
+  },
+  "L_Humerus_rb": {
+   "bone": "L_Humerus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "9.999999",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.056397438",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "L_Humerus_rb_capsule"
+   ],
+   "world_scale": [
+    0.00999999325722456,
+    0.00999999325722456,
+    0.009999995119869709
+   ]
+  },
+  "L_Metacarpus_rb": {
+   "bone": "L_Metacarpus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "6",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06431272",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "L_Metacarpus_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999994188547134,
+    0.009999997913837433,
+    0.009999996982514858
+   ]
+  },
+  "L_PhalangesManus_rb": {
+   "bone": "L_PhalangesManus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "5",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.057931557",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "L_PhalangesManus_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999994188547134,
+    0.00999999325722456,
+    0.009999996051192284
+   ]
+  },
+  "L_Radius_rb": {
+   "bone": "L_Radius",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "8",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06783696",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "L_Radius_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999994188547134,
+    0.009999996051192284,
+    0.009999997913837433
+   ]
+  },
+  "Neck1_rb": {
+   "bone": "Neck1",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "10",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06875055",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Neck1_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999997913837433,
+    0.009999996982514858,
+    0.009999996982514858
+   ]
+  },
+  "Neck3_rb": {
+   "bone": "Neck3",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "10",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.15",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Neck3_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999997913837433,
+    0.009999996051192284,
+    0.009999996982514858
+   ]
+  },
+  "Pelvis_rb": {
+   "bone": "Pelvis",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "25",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.15",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Pelvis_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999996051192284,
+    0.009999996051192284
+   ]
+  },
+  "RFemur_rb": {
+   "bone": "RFemur",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "10",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.15",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "RFemur_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999996982514858,
+    0.009999996051192284
+   ]
+  },
+  "RLargeCannon_rb": {
+   "bone": "RLargeCannon",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "6",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.060937915",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "RLargeCannon_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.009999998845160007
+   ]
+  },
+  "RPhalanxPrima_rb": {
+   "bone": "RPhalanxPrima",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "5",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.046958413",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "RPhalanxPrima_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999997913837433,
+    0.009999996051192284
+   ]
+  },
+  "RTibia_rb": {
+   "bone": "RTibia",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "7.999999",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.08306744",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "RTibia_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.009999997913837433
+   ]
+  },
+  "R_Humerus_rb": {
+   "bone": "R_Humerus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "10",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.056396917",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "R_Humerus_rb_capsule"
+   ],
+   "world_scale": [
+    0.010000000707805157,
+    0.009999998845160007,
+    0.009999999776482582
+   ]
+  },
+  "R_Metacarpus_rb": {
+   "bone": "R_Metacarpus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "6",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06431057",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "R_Metacarpus_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.010000001639127731
+   ]
+  },
+  "R_PhalangesManus_rb": {
+   "bone": "R_PhalangesManus",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "5",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.057932187",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "R_PhalangesManus_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999995119869709,
+    0.009999997913837433,
+    0.009999998845160007
+   ]
+  },
+  "R_Radius_rb": {
+   "bone": "R_Radius",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "8",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.06783582",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "R_Radius_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996051192284,
+    0.009999996982514858,
+    0.010000000707805157
+   ]
+  },
+  "Ribcage_rb": {
+   "bone": "Ribcage",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "40",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.15",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Ribcage_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999995119869709,
+    0.009999996051192284
+   ]
+  },
+  "SPINE1_rb": {
+   "bone": "SPINE1",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "4.999999",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.08278413",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "SPINE1_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999996982514858,
+    0.009999996051192284,
+    0.009999997913837433
+   ]
+  },
+  "Tail1_rb": {
+   "bone": "Tail1",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "8",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.038506437",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Tail1_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999997913837433,
+    0.009999998845160007,
+    0.009999996051192284
+   ]
+  },
+  "Tail3_rb": {
+   "bone": "Tail3",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "6",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.036676396",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Tail3_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999995119869709,
+    0.009999996982514858,
+    0.009999996051192284
+   ]
+  },
+  "Tail4_rb": {
+   "bone": "Tail4",
+   "properties": {
+    "nif_blend_heir_gain": "1",
+    "nif_blend_vel_gain": "1",
+    "nif_body_type": "bhkRigidBody",
+    "nif_collision_flags": "137",
+    "nif_collision_type": "bhkBlendCollisionObject",
+    "nif_rb_angular_damping": "0.049804688",
+    "nif_rb_friction": "0.3",
+    "nif_rb_layer": "SKYL_BIPED",
+    "nif_rb_linear_damping": "0.099609375",
+    "nif_rb_mass": "5",
+    "nif_rb_max_angular_velocity": "31.57",
+    "nif_rb_max_linear_velocity": "104.4",
+    "nif_rb_motion_system": "MO_SYS_BOX_INERTIA",
+    "nif_rb_penetration_depth": "0.03568302",
+    "nif_rb_quality_type": "MO_QUAL_FIXED",
+    "nif_rb_restitution": "0.8",
+    "nif_rb_solver_deactivation": "SOLVER_DEACTIVATION_LOW"
+   },
+   "shapes": [
+    "Tail4_rb_capsule"
+   ],
+   "world_scale": [
+    0.009999995119869709,
+    0.009999996982514858,
+    0.009999996051192284
+   ]
+  }
+ },
+ "joints": [
+  {
+   "far_frame": [
+    [
+     7.549790126404332e-08,
+     1.0,
+     4.371138828673793e-08,
+     0.0
+    ],
+    [
+     0.0,
+     -4.371138828673793e-08,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     -7.549790126404332e-08,
+     -3.3001180777756647e-15,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.06010986119508743,
+     0.432145357131958,
+     0.8997983932495117,
+     26.163890838623047
+    ],
+    [
+     0.0454949215054512,
+     -0.8993056416511536,
+     0.4349479377269745,
+     1.1444091796875e-05
+    ],
+    [
+     0.9971545338630676,
+     0.06708090007305145,
+     0.0343967042863369,
+     -7.62939453125e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "LFemur_rb_con_LTibia_rb_attach_point",
+   "parent": "LFemur_rb",
+   "properties": {
+    "constraint_body_a": "LTibia_rb",
+    "constraint_body_b": "LFemur_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "1.1920929E-07 5.9604645E-08 0.9999999 0.9999999",
+    "hkc_axis_b": "-0.060109086 0.045494348 0.9971545 0.43494865",
+    "hkc_max_angle": "0.15707964",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.7853982",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.9999999 5.9604645E-08 0 5.9604645E-08",
+    "hkc_perp_axis_in_a2": "5.9604645E-08 0.9999999 5.9604645E-08 0",
+    "hkc_perp_axis_in_b1": "0.4321462 -0.89930516 0.06708011 0.89979804",
+    "hkc_perp_axis_in_b2": "0.89979804 0.43494865 0.034396283 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.3738166 1.9075868E-07 -1.09004965E-07 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.15707963705062866,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.7853981852531433
+   }
+  },
+  {
+   "far_frame": [
+    [
+     7.549790126404332e-08,
+     0.13917341828346252,
+     0.9902680516242981,
+     0.0
+    ],
+    [
+     0.0,
+     -0.9902680516242981,
+     0.13917341828346252,
+     0.0
+    ],
+    [
+     1.0,
+     -1.0507299919026991e-08,
+     -7.476315744270323e-08,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.009270546026527882,
+     0.6550743579864502,
+     0.7555075287818909,
+     23.760671615600586
+    ],
+    [
+     -0.21232850849628448,
+     -0.7396003007888794,
+     0.6386765241622925,
+     3.0517578125e-05
+    ],
+    [
+     0.9771543741226196,
+     -0.15449489653110504,
+     0.14594748616218567,
+     -1.9073486328125e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "LLargeCannon_rb_con_LPhalanxPrima_rb_attach_point",
+   "parent": "LLargeCannon_rb",
+   "properties": {
+    "constraint_body_a": "LPhalanxPrima_rb",
+    "constraint_body_b": "LLargeCannon_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "4.0978193E-07 -9.983778E-07 1 0.13917308",
+    "hkc_axis_b": "-0.009270553 -0.21232787 0.9771544 0.63867545",
+    "hkc_max_angle": "0.34906584",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.08726646",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.13917308 -0.9902681 -1.0430813E-06 0.9902681",
+    "hkc_perp_axis_in_a2": "0.9902681 0.13917308 -3.054738E-07 0",
+    "hkc_perp_axis_in_b1": "0.65507317 -0.73960125 -0.15449455 0.7555083",
+    "hkc_perp_axis_in_b2": "0.7555083 0.63867545 0.1459471 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.33948064 3.270149E-07 -5.4502483E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.3490658402442932,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     0.012931027449667454,
+     0.6560786962509155,
+     -0.7545816898345947,
+     0.0
+    ],
+    [
+     -0.00147692218888551,
+     0.7546564340591431,
+     0.6561184525489807,
+     0.0
+    ],
+    [
+     0.9999153017997742,
+     -0.007369826547801495,
+     0.010727460496127605,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.0895702987909317,
+     0.04506498575210571,
+     -0.9949602484703064,
+     26.989498138427734
+    ],
+    [
+     -0.014530092477798462,
+     0.9989285469055176,
+     0.04393666982650757,
+     4.9591064453125e-05
+    ],
+    [
+     0.9958744645118713,
+     0.010521434247493744,
+     0.09012912213802338,
+     1.9073486328125e-05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "LTibia_rb_con_LLargeCannon_rb_attach_point",
+   "parent": "LTibia_rb",
+   "properties": {
+    "constraint_body_a": "LLargeCannon_rb",
+    "constraint_body_b": "LTibia_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "0.012922168 -0.0014758706 0.9999153 0.65612084",
+    "hkc_axis_b": "0.08956903 -0.014529873 0.9958745 0.04393668",
+    "hkc_max_angle": "0.65449846",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.36983523",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.65608114 0.75465435 -0.0073648095 -0.7545796",
+    "hkc_perp_axis_in_a2": "-0.7545796 0.65612084 0.010720074 0",
+    "hkc_perp_axis_in_b1": "0.04506497 0.99892867 0.010521289 -0.9949604",
+    "hkc_perp_axis_in_b2": "-0.9949604 0.04393668 0.090127885 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.3856126 5.450248E-07 2.4526116E-07 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.6544984579086304,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.36983522772789
+   }
+  },
+  {
+   "far_frame": [
+    [
+     0.07554372400045395,
+     0.49225854873657227,
+     -0.8671647310256958,
+     0.0
+    ],
+    [
+     -0.19338300824165344,
+     0.8603711724281311,
+     0.4715553820133209,
+     0.0
+    ],
+    [
+     0.9782106876373291,
+     0.13207188248634338,
+     0.16019007563591003,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.21770289540290833,
+     -0.325362890958786,
+     -0.92018723487854,
+     23.979726791381836
+    ],
+    [
+     -0.03263404965400696,
+     0.939846396446228,
+     -0.34003493189811707,
+     -4.00543212890625e-05
+    ],
+    [
+     0.9754694700241089,
+     0.10405601561069489,
+     0.1939893662929535,
+     -3.814697265625e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "L_Humerus_rb_con_L_Radius_rb_attach_point",
+   "parent": "L_Humerus_rb",
+   "properties": {
+    "constraint_body_a": "L_Radius_rb",
+    "constraint_body_b": "L_Humerus_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "0.0755437 -0.19338259 0.9782107 0.4715553",
+    "hkc_axis_b": "0.21770275 -0.03263405 0.97546935 -0.340035",
+    "hkc_max_angle": "0.42332962",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.49480084",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.4922584 0.8603713 0.13207157 -0.86716473",
+    "hkc_perp_axis_in_a2": "-0.86716473 0.4715553 0.16018987 0",
+    "hkc_perp_axis_in_b1": "-0.32536307 0.9398464 0.10405595 -0.9201871",
+    "hkc_perp_axis_in_b2": "-0.9201871 -0.340035 0.19398928 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.3426104 -4.632711E-07 -5.4502483E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.423329621553421,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.4948008358478546
+   }
+  },
+  {
+   "far_frame": [
+    [
+     -0.005939984228461981,
+     0.3387334644794464,
+     0.9408636093139648,
+     0.0
+    ],
+    [
+     0.004257138818502426,
+     -0.9408630728721619,
+     0.3387601971626282,
+     0.0
+    ],
+    [
+     0.9999732971191406,
+     0.006017616949975491,
+     0.0041466765105724335,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.007074274122714996,
+     0.9286220669746399,
+     0.3709598779678345,
+     16.790626525878906
+    ],
+    [
+     -0.22886133193969727,
+     -0.3596193194389343,
+     0.9045974612236023,
+     -5.7220458984375e-06
+    ],
+    [
+     0.9734333753585815,
+     -0.0912977010011673,
+     0.20998156070709229,
+     -3.814697265625e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "L_Metacarpus_rb_con_L_PhalangesManus_rb_attach_point",
+   "parent": "L_Metacarpus_rb",
+   "properties": {
+    "constraint_body_a": "L_PhalangesManus_rb",
+    "constraint_body_b": "L_Metacarpus_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "-0.0059239753 0.004245624 0.9999733 0.3387642",
+    "hkc_axis_b": "0.0070741773 -0.22886103 0.9734334 0.9045973",
+    "hkc_max_angle": "0.34906584",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.08726646",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.3387376 -0.94086146 0.006001428 0.94086206",
+    "hkc_perp_axis_in_a2": "0.94086206 0.3387642 0.004135739 0",
+    "hkc_perp_axis_in_b1": "0.9286217 -0.35961956 -0.09129754 0.37096027",
+    "hkc_perp_axis_in_b2": "0.37096027 0.9045973 0.20998144 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.23989606 -1.362562E-07 -1.3625621E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.3490658402442932,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     0.049926575273275375,
+     0.021254418417811394,
+     0.9985266923904419,
+     0.0
+    ],
+    [
+     -0.014045664109289646,
+     -0.9996597170829773,
+     0.02198082208633423,
+     0.0
+    ],
+    [
+     0.9986541271209717,
+     -0.015122397802770138,
+     -0.04961105436086655,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.03880079835653305,
+     -0.12659534811973572,
+     0.9911953210830688,
+     19.37139129638672
+    ],
+    [
+     0.19044505059719086,
+     -0.9728230834007263,
+     -0.1317039132118225,
+     -3.814697265625e-06
+    ],
+    [
+     0.980930745601654,
+     0.19387845695018768,
+     -0.013636849820613861,
+     2.86102294921875e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "L_Radius_rb_con_L_Metacarpus_rb_attach_point",
+   "parent": "L_Radius_rb",
+   "properties": {
+    "constraint_body_a": "L_Metacarpus_rb",
+    "constraint_body_b": "L_Radius_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "0.04992309 -0.014044663 0.9986541 0.021978503",
+    "hkc_axis_b": "0.0388006 0.19044426 0.9809308 -0.1317032",
+    "hkc_max_angle": "0.5717702",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.526044",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.02125221 -0.9996593 -0.015121204 0.9985267",
+    "hkc_perp_axis_in_a2": "0.9985267 0.021978503 -0.04960713 0",
+    "hkc_perp_axis_in_b1": "-0.12659469 -0.97282314 0.19387764 0.9911953",
+    "hkc_perp_axis_in_b2": "0.9911953 -0.1317032 -0.0136367045 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.27676877 -5.4502483E-08 4.0876863E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.571770191192627,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.5260440111160278
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     1.1121006764369668e-06,
+     -9.425852454114647e-07,
+     0.0
+    ],
+    [
+     9.382761732013023e-07,
+     0.003868407104164362,
+     0.9999924302101135,
+     0.0
+    ],
+    [
+     1.1157387689308962e-06,
+     -0.9999924302101135,
+     0.003868407104164362,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.986850917339325,
+     0.0006257244967855513,
+     0.16163207590579987,
+     33.523765563964844
+    ],
+    [
+     -0.16163329780101776,
+     0.0038164996076375246,
+     0.9868435263633728,
+     -3.3048105239868164
+    ],
+    [
+     6.23498749519058e-07,
+     -0.9999925494194031,
+     0.0038674536626785994,
+     2.5331974029541016e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Neck1_rb_con_Neck3_rb_attach_point",
+   "parent": "Neck1_rb",
+   "properties": {
+    "coneMaxAngle": 0.2617993950843811,
+    "constraint_body_a": "Neck3_rb",
+    "constraint_body_b": "Neck1_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.2617994",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-9.4258513E-07 0.9999924 0.0038685799 0",
+    "hkc_motor_b": "0.16163206 0.98684335 0.0038674884 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.47897086 -0.047217462 3.6405954E-08 0",
+    "hkc_plane_a": "1.1121004E-06 0.0038685799 -0.9999924 -9.4258513E-07",
+    "hkc_plane_b": "0.00062569976 0.003816545 -0.9999924 0.16163206",
+    "hkc_plane_max_angle": "0.20943952",
+    "hkc_plane_min_angle": "-0.20943952",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 9.38276E-07 1.1157385E-06 0.9999924",
+    "hkc_twist_b": "0.9868509 -0.16163328 6.183982E-07 0.98684335",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.20943951606750488,
+    "planeMinAngle": -0.20943951606750488,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     3.1391647326017846e-07,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     -1.0,
+     3.1391647326017846e-07,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.40971076488494873,
+     -0.26157283782958984,
+     0.8739086389541626,
+     -19.62082290649414
+    ],
+    [
+     0.9006870985031128,
+     -0.03582555800676346,
+     -0.4329882860183716,
+     11.63519287109375
+    ],
+    [
+     0.14456631243228912,
+     0.9645184278488159,
+     0.2209172546863556,
+     12.88125991821289
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Pelvis_rb_con_LFemur_rb_attach_point",
+   "parent": "Pelvis_rb",
+   "properties": {
+    "coneMaxAngle": 0.3490658402442932,
+    "constraint_body_a": "LFemur_rb",
+    "constraint_body_b": "Pelvis_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.34906584",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-0 0.9999999 1.7881393E-07 0",
+    "hkc_motor_b": "0.87390864 -0.4329883 0.22091733 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "-0.2803326 0.1662379 0.18404102 0",
+    "hkc_plane_a": "0 1.7881393E-07 -0.9999999 -0",
+    "hkc_plane_b": "-0.26157266 -0.035825312 0.9645184 0.87390864",
+    "hkc_plane_max_angle": "0.2268928",
+    "hkc_plane_min_angle": "-0.20943952",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0.9999999",
+    "hkc_twist_b": "0.40971106 0.90068704 0.14456627 -0.4329883",
+    "hkc_twist_max_angle": "0.05235988",
+    "hkc_twist_min_angle": "-0.05235988",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.22689279913902283,
+    "planeMinAngle": -0.20943951606750488,
+    "twistMaxAngle": 0.05235987901687622,
+    "twistMinAngle": -0.05235987901687622
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     3.1391647326017846e-07,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     -1.0,
+     3.1391647326017846e-07,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.42982468008995056,
+     0.10179518908262253,
+     0.8971554636955261,
+     -19.620845794677734
+    ],
+    [
+     0.9005993008613586,
+     0.02273949421942234,
+     -0.4340547025203705,
+     11.635214805603027
+    ],
+    [
+     -0.06458555161952972,
+     0.9945453405380249,
+     -0.08190269768238068,
+     -12.881213188171387
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Pelvis_rb_con_RFemur_rb_attach_point",
+   "parent": "Pelvis_rb",
+   "properties": {
+    "coneMaxAngle": 0.3490658402442932,
+    "constraint_body_a": "RFemur_rb",
+    "constraint_body_b": "Pelvis_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.34906584",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-0 0.9999999 1.7881393E-07 0",
+    "hkc_motor_b": "0.8971557 -0.43405476 -0.08190265 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "-0.28033292 0.16623813 -0.18404037 0",
+    "hkc_plane_a": "0 1.7881393E-07 -0.9999999 -0",
+    "hkc_plane_b": "0.10179523 0.02273953 0.99454546 0.8971557",
+    "hkc_plane_max_angle": "0.20943952",
+    "hkc_plane_min_angle": "-0.2268928",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0.9999999",
+    "hkc_twist_b": "0.4298248 0.9005995 -0.06458557 -0.43405476",
+    "hkc_twist_max_angle": "0.05235988",
+    "hkc_twist_min_angle": "-0.05235988",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.20943951606750488,
+    "planeMinAngle": -0.22689279913902283,
+    "twistMaxAngle": 0.05235987901687622,
+    "twistMinAngle": -0.05235987901687622
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.999875545501709,
+     0.015745773911476135,
+     -0.000858092273119837,
+     0.0
+    ],
+    [
+     -0.015745772048830986,
+     0.9998759031295776,
+     1.8273331079399213e-05,
+     -1.1920928955078125e-07
+    ],
+    [
+     0.0008582737646065652,
+     -4.759740022564074e-06,
+     0.9999995231628418,
+     -9.094947017729282e-13
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Pelvis_rb_con_SPINE1_rb_attach_point",
+   "parent": "Pelvis_rb",
+   "properties": {
+    "coneMaxAngle": 0.0872664600610733,
+    "constraint_body_a": "SPINE1_rb",
+    "constraint_body_b": "Pelvis_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.08726646",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "0 0 1 0",
+    "hkc_motor_b": "-0.0008580925 1.8273342E-05 0.99999964 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0 0 0 0",
+    "hkc_plane_a": "0 1 0 0",
+    "hkc_plane_b": "0.015745781 0.999876 -4.7597405E-06 -0.0008580925",
+    "hkc_plane_max_angle": "0.52359706",
+    "hkc_plane_min_angle": "-0.52359706",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0",
+    "hkc_twist_b": "0.99987566 -0.01574577 0.0008582739 1.8273342E-05",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.5235970616340637,
+    "planeMinAngle": -0.5235970616340637,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.22113394737243652,
+     -0.975243330001831,
+     1.7905880440594046e-06,
+     -33.48297119140625
+    ],
+    [
+     0.9752432703971863,
+     -0.22113393247127533,
+     5.044798285780416e-07,
+     -0.3168296813964844
+    ],
+    [
+     -9.603076023267931e-08,
+     1.85781686923292e-06,
+     0.9999998807907104,
+     3.0427258025156334e-05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Pelvis_rb_con_Tail1_rb_attach_point",
+   "parent": "Pelvis_rb",
+   "properties": {
+    "coneMaxAngle": 0.0872664600610733,
+    "constraint_body_a": "Tail1_rb",
+    "constraint_body_b": "Pelvis_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.08726646",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "0 0 1 0",
+    "hkc_motor_b": "1.7905884E-06 5.0448017E-07 1 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "-0.47838807 -0.004526649 4.3472951E-07 0",
+    "hkc_plane_a": "0 1 0 0",
+    "hkc_plane_b": "-0.97524333 -0.22113395 1.8578173E-06 1.7905884E-06",
+    "hkc_plane_max_angle": "0.52359706",
+    "hkc_plane_min_angle": "-0.52359706",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0",
+    "hkc_twist_b": "-0.22113395 0.97524333 -9.603082E-08 5.0448017E-07",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.5235970616340637,
+    "planeMinAngle": -0.5235970616340637,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     7.549790126404332e-08,
+     1.0,
+     4.371138828673793e-08,
+     0.0
+    ],
+    [
+     0.0,
+     -4.371138828673793e-08,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     -7.549790126404332e-08,
+     -3.3001180777756647e-15,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.06011050194501877,
+     0.4321471154689789,
+     0.8997975587844849,
+     26.16388511657715
+    ],
+    [
+     -0.045495301485061646,
+     -0.8993047475814819,
+     0.4349496066570282,
+     1.9073486328125e-05
+    ],
+    [
+     0.9971543550491333,
+     -0.06708160042762756,
+     -0.03439699113368988,
+     3.814697265625e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "RFemur_rb_con_RTibia_rb_attach_point",
+   "parent": "RFemur_rb",
+   "properties": {
+    "constraint_body_a": "RTibia_rb",
+    "constraint_body_b": "RFemur_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "1.1920929E-07 5.9604645E-08 0.9999999 0.9999999",
+    "hkc_axis_b": "0.06010966 -0.045494646 0.9971544 0.4349481",
+    "hkc_max_angle": "0.15707964",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.7853982",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.9999999 5.9604645E-08 0 5.9604645E-08",
+    "hkc_perp_axis_in_a2": "5.9604645E-08 0.9999999 5.9604645E-08 0",
+    "hkc_perp_axis_in_b1": "0.43214557 -0.89930534 -0.06708056 0.8997982",
+    "hkc_perp_axis_in_b2": "0.8997982 0.4349481 -0.034396484 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.3738166 1.9075868E-07 5.4502483E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.15707963705062866,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.7853981852531433
+   }
+  },
+  {
+   "far_frame": [
+    [
+     7.549790126404332e-08,
+     0.09584560245275497,
+     0.9953961968421936,
+     0.0
+    ],
+    [
+     0.0,
+     -0.9953961968421936,
+     0.09584560245275497,
+     0.0
+    ],
+    [
+     1.0,
+     -7.236141463806689e-09,
+     -7.515032507399155e-08,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.0023027376737445593,
+     0.6173223853111267,
+     0.786706805229187,
+     23.760677337646484
+    ],
+    [
+     0.051464326679706573,
+     -0.7855932116508484,
+     0.6165992021560669,
+     0.0
+    ],
+    [
+     0.9986721277236938,
+     0.04190720245242119,
+     -0.02996107004582882,
+     2.86102294921875e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "RLargeCannon_rb_con_RPhalanxPrima_rb_attach_point",
+   "parent": "RLargeCannon_rb",
+   "properties": {
+    "constraint_body_a": "RPhalanxPrima_rb",
+    "constraint_body_b": "RLargeCannon_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "-1.3760291E-07 1.3411045E-07 1 0.095845394",
+    "hkc_axis_b": "-0.0023028105 0.051463097 0.9986722 0.61660236",
+    "hkc_max_angle": "0.34906584",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.08726646",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.095845394 -0.9953963 1.4156103E-07 0.99539626",
+    "hkc_perp_axis_in_a2": "0.99539626 0.095845394 4.1211024E-08 0",
+    "hkc_perp_axis_in_b1": "0.61732554 -0.78559077 0.041906238 0.78670436",
+    "hkc_perp_axis_in_b2": "0.78670436 0.61660236 -0.02996032 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.3394807 -1.09004965E-07 4.0876863E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.3490658402442932,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     -0.014234860427677631,
+     0.5863999128341675,
+     -0.8098964691162109,
+     0.0
+    ],
+    [
+     0.0009851765353232622,
+     0.809986412525177,
+     0.5864477157592773,
+     0.0
+    ],
+    [
+     0.9998981952667236,
+     0.007550110574811697,
+     -0.012107751332223415,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.09041757881641388,
+     -0.04396304488182068,
+     -0.9949331283569336,
+     26.989490509033203
+    ],
+    [
+     0.013221455737948418,
+     0.9988840818405151,
+     -0.04533928632736206,
+     4.9591064453125e-05
+    ],
+    [
+     0.995816171169281,
+     -0.017253920435905457,
+     -0.08973541855812073,
+     -1.33514404296875e-05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "RTibia_rb_con_RLargeCannon_rb_attach_point",
+   "parent": "RTibia_rb",
+   "properties": {
+    "constraint_body_a": "RLargeCannon_rb",
+    "constraint_body_b": "RTibia_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "-0.014231503 0.000984937 0.9998982 0.58644664",
+    "hkc_axis_b": "-0.09041661 0.013221293 0.9958162 -0.045339078",
+    "hkc_max_angle": "0.65449846",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.3698353",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.58639884 0.80998725 0.007548362 -0.8098973",
+    "hkc_perp_axis_in_a2": "-0.8098973 0.58644664 -0.012104869 0",
+    "hkc_perp_axis_in_b1": "-0.043962985 0.99888414 -0.017253712 -0.99493307",
+    "hkc_perp_axis_in_b2": "-0.99493307 -0.045339078 -0.089734435 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.38561237 6.540298E-07 -1.9075868E-07 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.6544984579086304,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.3698352873325348
+   }
+  },
+  {
+   "far_frame": [
+    [
+     -0.06300513446331024,
+     0.5601154565811157,
+     -0.8260151743888855,
+     0.0
+    ],
+    [
+     0.18283703923225403,
+     0.8201298713684082,
+     0.5421785712242126,
+     0.0
+    ],
+    [
+     0.9811223149299622,
+     -0.11686611920595169,
+     -0.15408223867416382,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.0501791387796402,
+     -0.30015408992767334,
+     -0.9525699615478516,
+     23.97972869873047
+    ],
+    [
+     0.14221566915512085,
+     0.94190514087677,
+     -0.3042852580547333,
+     -3.0517578125e-05
+    ],
+    [
+     0.9885629415512085,
+     -0.1507391482591629,
+     -0.0045773945748806,
+     -1.52587890625e-05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "R_Humerus_rb_con_R_Radius_rb_attach_point",
+   "parent": "R_Humerus_rb",
+   "properties": {
+    "constraint_body_a": "R_Radius_rb",
+    "constraint_body_b": "R_Humerus_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "-0.06300473 0.18283589 0.9811223 0.54217875",
+    "hkc_axis_b": "-0.050178647 0.14221397 0.988563 -0.3042854",
+    "hkc_max_angle": "0.4233296",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.49480084",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.5601154 0.82013 -0.11686528 -0.82601494",
+    "hkc_perp_axis_in_a2": "-0.82601494 0.54217875 -0.15408123 0",
+    "hkc_perp_axis_in_b1": "-0.30015436 0.94190526 -0.15073743 -0.95256966",
+    "hkc_perp_axis_in_b2": "-0.95256966 -0.3042854 -0.0045773983 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.34261045 -3.8151737E-07 -1.9075868E-07 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.42332959175109863,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.4948008358478546
+   }
+  },
+  {
+   "far_frame": [
+    [
+     0.00620083836838603,
+     0.16677816212177277,
+     0.9859749674797058,
+     0.0
+    ],
+    [
+     -0.005342845339328051,
+     -0.9859742522239685,
+     0.16681167483329773,
+     0.0
+    ],
+    [
+     0.9999665021896362,
+     -0.0063022831454873085,
+     -0.005222797393798828,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.058531589806079865,
+     0.8164783120155334,
+     0.5744016766548157,
+     16.79062843322754
+    ],
+    [
+     -0.12016662210226059,
+     -0.5769668817520142,
+     0.8078794479370117,
+     -1.9073486328125e-06
+    ],
+    [
+     0.9910266399383545,
+     -0.021737445145845413,
+     0.13188423216342926,
+     -5.7220458984375e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "R_Metacarpus_rb_con_R_PhalangesManus_rb_attach_point",
+   "parent": "R_Metacarpus_rb",
+   "properties": {
+    "constraint_body_a": "R_PhalangesManus_rb",
+    "constraint_body_b": "R_Metacarpus_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "0.0061995513 -0.005341746 0.9999665 0.16680248",
+    "hkc_axis_b": "-0.05853097 -0.1201655 0.99102676 0.80787885",
+    "hkc_max_angle": "0.34906584",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.08726646",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "0.166769 -0.9859758 -0.006300941 0.98597646",
+    "hkc_perp_axis_in_a2": "0.98597646 0.16680248 -0.005221712 0",
+    "hkc_perp_axis_in_b1": "0.81647754 -0.57696736 -0.021737248 0.57440245",
+    "hkc_perp_axis_in_b2": "0.57440245 0.80787885 0.13188322 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.2398961 -5.4502483E-08 -5.4502483E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.3490658402442932,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     -0.050786688923835754,
+     -0.03457824885845184,
+     0.9981107711791992,
+     0.0
+    ],
+    [
+     0.01597842015326023,
+     -0.9993006587028503,
+     -0.033806443214416504,
+     0.0
+    ],
+    [
+     0.9985817074775696,
+     0.01423131674528122,
+     0.0513036772608757,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.19686514139175415,
+     -0.21393898129463196,
+     0.9568041563034058,
+     19.37139892578125
+    ],
+    [
+     -0.0005893341731280088,
+     -0.9758760333061218,
+     -0.2183246612548828,
+     0.0
+    ],
+    [
+     0.9804304838180542,
+     -0.04354439303278923,
+     0.19198988378047943,
+     -3.814697265625e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "R_Radius_rb_con_R_Metacarpus_rb_attach_point",
+   "parent": "R_Radius_rb",
+   "properties": {
+    "constraint_body_a": "R_Metacarpus_rb",
+    "constraint_body_b": "R_Radius_rb",
+    "constraint_frame": "B",
+    "constraint_type": "LimitedHinge",
+    "hkc_axis_a": "-0.050782174 0.015976995 0.9985817 -0.03380438",
+    "hkc_axis_b": "-0.19686478 -0.0005893335 0.9804304 -0.2183246",
+    "hkc_max_angle": "0.57176983",
+    "hkc_max_friction": "0.01",
+    "hkc_min_angle": "-0.5260422",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_perp_axis_in_a1": "-0.03457605 -0.99930036 0.014230151 0.99811083",
+    "hkc_perp_axis_in_a2": "0.99811083 -0.03380438 0.051299483 0",
+    "hkc_perp_axis_in_b1": "-0.21393895 -0.9758759 -0.043544322 0.9568042",
+    "hkc_perp_axis_in_b2": "0.9568042 -0.2183246 0.19198966 0",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.27676886 2.7251241E-08 -8.1753726E-08 0",
+    "hkc_priority": "1",
+    "maxAngle": 0.5717698335647583,
+    "maxFriction": 0.009999999776482582,
+    "minAngle": -0.5260422229766846
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.7093007564544678,
+     0.7039990425109863,
+     -0.035745859146118164,
+     14.325897216796875
+    ],
+    [
+     0.7037881016731262,
+     0.7044100761413574,
+     -0.09213311970233917,
+     30.052051544189453
+    ],
+    [
+     -0.03968189284205437,
+     -0.0905076116323471,
+     -0.9951048493385315,
+     16.604202270507812
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Ribcage_rb_con_L_Humerus_rb_attach_point",
+   "parent": "Ribcage_rb",
+   "properties": {
+    "coneMaxAngle": 0.23076742887496948,
+    "constraint_body_a": "L_Humerus_rb",
+    "constraint_body_b": "Ribcage_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.23076743",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "0 0 1 0",
+    "hkc_motor_b": "-0.035745814 -0.09213302 -0.9951048 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.20468122 0.42936882 0.23723258 0",
+    "hkc_plane_a": "0 1 0 0",
+    "hkc_plane_b": "0.7039989 0.7044103 -0.090507515 -0.035745814",
+    "hkc_plane_max_angle": "0.18849555",
+    "hkc_plane_min_angle": "-0.091358274",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0",
+    "hkc_twist_b": "-0.70930076 0.70378804 -0.03968183 -0.09213302",
+    "hkc_twist_max_angle": "0.034906585",
+    "hkc_twist_min_angle": "-0.034906585",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.18849554657936096,
+    "planeMinAngle": -0.09135827422142029,
+    "twistMaxAngle": 0.03490658476948738,
+    "twistMinAngle": -0.03490658476948738
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     1.1121006764369668e-06,
+     -9.425852454114647e-07,
+     0.0
+    ],
+    [
+     9.382761732013023e-07,
+     0.003868407104164362,
+     0.9999924302101135,
+     0.0
+    ],
+    [
+     1.1157387689308962e-06,
+     -0.9999924302101135,
+     0.003868407104164362,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.9801540970802307,
+     0.0007683677249588072,
+     0.19823585450649261,
+     8.71027946472168
+    ],
+    [
+     -0.1982373297214508,
+     0.0037910868413746357,
+     0.980146586894989,
+     10.849852561950684
+    ],
+    [
+     1.5837968021514826e-06,
+     -0.9999924302101135,
+     0.003868168918415904,
+     -0.022230222821235657
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Ribcage_rb_con_Neck1_rb_attach_point",
+   "parent": "Ribcage_rb",
+   "properties": {
+    "coneMaxAngle": 0.24884510040283203,
+    "constraint_body_a": "Neck1_rb",
+    "constraint_body_b": "Ribcage_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.2488451",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-9.4258513E-07 0.9999924 0.0038685799 0",
+    "hkc_motor_b": "0.19823584 0.98014665 0.0038682045 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.124448135 0.15501727 -0.0003176147 0",
+    "hkc_plane_a": "1.1121004E-06 0.0038685799 -0.9999924 -9.4258513E-07",
+    "hkc_plane_b": "0.0007683709 0.0037910938 -0.9999925 0.19823584",
+    "hkc_plane_max_angle": "0.08726646",
+    "hkc_plane_min_angle": "-0.08726646",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 9.38276E-07 1.1157385E-06 0.9999924",
+    "hkc_twist_b": "0.98015404 -0.19823733 1.5869737E-06 0.98014665",
+    "hkc_twist_max_angle": "0.034906585",
+    "hkc_twist_min_angle": "-0.034906585",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.0872664600610733,
+    "planeMinAngle": -0.0872664600610733,
+    "twistMaxAngle": 0.03490658476948738,
+    "twistMinAngle": -0.03490658476948738
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     -0.6936350464820862,
+     0.6920416951179504,
+     0.19987183809280396,
+     14.325916290283203
+    ],
+    [
+     0.714808464050293,
+     0.6955728530883789,
+     0.07230008393526077,
+     30.05201530456543
+    ],
+    [
+     -0.08899074047803879,
+     0.19301994144916534,
+     -0.9771509766578674,
+     -16.60431671142578
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Ribcage_rb_con_R_Humerus_rb_attach_point",
+   "parent": "Ribcage_rb",
+   "properties": {
+    "coneMaxAngle": 0.2307620644569397,
+    "constraint_body_a": "R_Humerus_rb",
+    "constraint_body_b": "Ribcage_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.23076206",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "0 0 1 0",
+    "hkc_motor_b": "0.19987157 0.072299875 -0.9771507 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.20468155 0.42936823 -0.23723418 0",
+    "hkc_plane_a": "0 1 0 0",
+    "hkc_plane_b": "0.6920415 0.69557303 0.1930196 0.19987157",
+    "hkc_plane_max_angle": "0.20420352",
+    "hkc_plane_min_angle": "-0.034906585",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0",
+    "hkc_twist_b": "-0.6936348 0.7148082 -0.088990726 0.072299875",
+    "hkc_twist_max_angle": "0.017453292",
+    "hkc_twist_min_angle": "-0.01745331",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.2042035162448883,
+    "planeMinAngle": -0.03490658476948738,
+    "twistMaxAngle": 0.01745329238474369,
+    "twistMinAngle": -0.017453309148550034
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.9998887181282043,
+     0.014893920160830021,
+     0.0008566323667764664,
+     71.03675079345703
+    ],
+    [
+     -0.014893926680088043,
+     0.999889075756073,
+     -1.2990421964786947e-06,
+     -3.077974796295166
+    ],
+    [
+     -0.0008565568132326007,
+     -1.1459718734840862e-05,
+     0.9999997019767761,
+     0.11920498311519623
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "SPINE1_rb_con_Ribcage_rb_attach_point",
+   "parent": "SPINE1_rb",
+   "properties": {
+    "coneMaxAngle": 0.0872664600610733,
+    "constraint_body_a": "Ribcage_rb",
+    "constraint_body_b": "SPINE1_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.08726646",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "0 0 1 0",
+    "hkc_motor_b": "0.00085663237 -1.2990463E-06 0.99999964 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "1.0149376 -0.043976635 0.0017031408 0",
+    "hkc_plane_a": "0 1 0 0",
+    "hkc_plane_b": "0.014893923 0.9998891 -1.1459719E-05 0.00085663237",
+    "hkc_plane_max_angle": "0.52359706",
+    "hkc_plane_min_angle": "-0.52359706",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 0 0 0",
+    "hkc_twist_b": "0.9998887 -0.014893927 -0.0008565567 -1.2990463E-06",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.5235970616340637,
+    "planeMinAngle": -0.5235970616340637,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     1.1121006764369668e-06,
+     -9.425852454114647e-07,
+     0.0
+    ],
+    [
+     9.382761732013023e-07,
+     0.003868407104164362,
+     0.9999924302101135,
+     0.0
+    ],
+    [
+     1.1157387689308962e-06,
+     -0.9999924302101135,
+     0.003868407104164362,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     0.9762963652610779,
+     0.0008386190747842193,
+     0.2164367288351059,
+     33.68737030029297
+    ],
+    [
+     -0.21643835306167603,
+     0.0037787328474223614,
+     0.9762889742851257,
+     -4.530769348144531
+    ],
+    [
+     8.781943279245752e-07,
+     -0.9999924898147583,
+     0.003870672080665827,
+     -1.5258796338457614e-05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Tail1_rb_con_Tail3_rb_attach_point",
+   "parent": "Tail1_rb",
+   "properties": {
+    "coneMaxAngle": 0.0872664600610733,
+    "constraint_body_a": "Tail3_rb",
+    "constraint_body_b": "Tail1_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.08726646",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-9.4258513E-07 0.9999924 0.0038685799 0",
+    "hkc_motor_b": "0.21643671 0.97628886 0.0038706725 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.48130837 -0.06473336 -2.1800993E-07 0",
+    "hkc_plane_a": "1.1121004E-06 0.0038685799 -0.9999924 -9.4258513E-07",
+    "hkc_plane_b": "0.00083862245 0.0037787557 -0.99999243 0.21643671",
+    "hkc_plane_max_angle": "0.2617994",
+    "hkc_plane_min_angle": "-0.2617994",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 9.38276E-07 1.1157385E-06 0.9999924",
+    "hkc_twist_b": "0.9762963 -0.21643834 8.940697E-07 0.97628886",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.2617993950843811,
+    "planeMinAngle": -0.2617993950843811,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  },
+  {
+   "far_frame": [
+    [
+     1.0,
+     1.1121006764369668e-06,
+     -9.425852454114647e-07,
+     0.0
+    ],
+    [
+     9.382761732013023e-07,
+     0.003868407104164362,
+     0.9999924302101135,
+     0.0
+    ],
+    [
+     1.1157387689308962e-06,
+     -0.9999924302101135,
+     0.003868407104164362,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "matrix_local": [
+    [
+     1.0,
+     1.1397060006856918e-06,
+     -9.909272193908691e-07,
+     27.005855560302734
+    ],
+    [
+     9.872019290924072e-07,
+     0.0038682876620441675,
+     0.9999924302101135,
+     -1.52587890625e-05
+    ],
+    [
+     1.1435350870669936e-06,
+     -0.9999923706054688,
+     0.003868287429213524,
+     3.814624506048858e-06
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Tail3_rb_con_Tail4_rb_attach_point",
+   "parent": "Tail3_rb",
+   "properties": {
+    "coneMaxAngle": 0.0872664600610733,
+    "constraint_body_a": "Tail4_rb",
+    "constraint_body_b": "Tail3_rb",
+    "constraint_frame": "B",
+    "constraint_type": "Ragdoll",
+    "hkc_cone_max_angle": "0.08726646",
+    "hkc_max_friction": "10",
+    "hkc_motor_a": "-9.4258513E-07 0.9999924 0.0038685799 0",
+    "hkc_motor_b": "-9.947074E-07 0.9999924 0.0038682222 0",
+    "hkc_motor_type": "0",
+    "hkc_num_entities": "2",
+    "hkc_pivot_a": "0 0 0 0",
+    "hkc_pivot_b": "0.38584626 -1.09004965E-07 5.450165E-08 0",
+    "hkc_plane_a": "1.1121004E-06 0.0038685799 -0.9999924 -9.4258513E-07",
+    "hkc_plane_b": "1.1396961E-06 0.0038682222 -0.9999924 -9.947074E-07",
+    "hkc_plane_max_angle": "0.17453292",
+    "hkc_plane_min_angle": "-0.17453292",
+    "hkc_priority": "1",
+    "hkc_twist_a": "1 9.38276E-07 1.1157385E-06 0.9999924",
+    "hkc_twist_b": "1 9.902916E-07 1.1435351E-06 0.9999924",
+    "hkc_twist_max_angle": "0.08726646",
+    "hkc_twist_min_angle": "-0.08726646",
+    "maxFriction": 10.0,
+    "planeMaxAngle": 0.1745329201221466,
+    "planeMinAngle": -0.1745329201221466,
+    "twistMaxAngle": 0.0872664600610733,
+    "twistMinAngle": -0.0872664600610733
+   }
+  }
+ ],
+ "source": "skeleton_cow.fbx"
+}

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Everything that can be run on this machine.
 #
-#   tests/run.sh [path/to/skeleton.fbx]
+#   tests/run.sh [path/to/skeleton.fbx] [path/to/effect.fbx]
 #
 # Without an FBX, the host-free suites run: the Maya and Max scripts against a
 # recorded fixture, and the check that the three schema copies have not drifted.
-# With one, the Blender add-on runs inside Blender as well.
+# With one, the constraints add-on runs inside Blender as well; with a second,
+# so does the particle add-on, which needs an effect rather than a creature.
 #
 # --factory-startup is deliberately NOT passed to Blender. It leaves
 # io_scene_fbx's operator properties unregistered and the exporter then dies with
@@ -36,6 +37,19 @@ if [ "$#" -ge 1 ]; then
 else
     echo
     echo "== blender: skipped, pass an FBX to run it =="
+fi
+
+# An effect rather than a creature: the second argument, because no one file has
+# both a ragdoll and a particle system.
+if [ "$#" -ge 2 ]; then
+    echo
+    echo "== blender particles (live) =="
+    "$blender" --background --python "$here/run_particles_in_blender.py" -- "$2" 2>&1 \
+        | grep -E '^(PASS|FAIL|     )|checks failed|FAILED:'
+    failures=$((failures + ${PIPESTATUS[0]}))
+else
+    echo
+    echo "== blender particles: skipped, pass an effect FBX as the second argument =="
 fi
 
 echo

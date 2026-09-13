@@ -5,11 +5,12 @@ constraints the DCC can actually use, and write them back when you are done.
 
 | | | Verified |
 | --- | --- | --- |
-| [`blender/`](blender) | add-on, `RigidBodyConstraint` + `LIMIT_ROTATION` | in Blender 5.0.1 |
+| [`blender/skyrim_havok_constraints`](blender/skyrim_havok_constraints) | add-on, `RigidBodyConstraint` + `LIMIT_ROTATION` | in Blender 5.0.1 |
+| [`blender/skyrim_particles`](blender/skyrim_particles) | add-on, Blender particle systems | in Blender 5.0.1, over 125 systems |
 | [`maya/`](maya) | `maya.cmds`, Bullet six-DOF + `transformLimits` | fixture only |
 | [`max/`](max) | `pymxs`, MassFX `UConstraint` + rotation limits | fixture only |
 
-Only the Blender add-on has been run in its host. Maya and Max are tested against
+Only the Blender add-ons have been run in their host. Maya and Max are tested against
 a fixture taken off a real ragdoll with a recording stand-in for the host API,
 which catches a wrong property name, enum, unit or axis and cannot catch the
 host's own semantics. Each README says what to check first.
@@ -58,6 +59,35 @@ TD tuning a ragdoll wants.
 back into the properties the exporters read.
 
 Both build paths are reversible and neither touches a property.
+
+## Particles
+
+`Properties ▸ Particles ▸ Build Particle Systems` does the same job for an
+effect. A NIF particle system arrives as an empty carrying the system's fields
+with one child node per modifier, because FBX has no emitter and nothing that
+means what `NiPSysCylinderEmitter` means. This reads that stack and builds a
+Blender particle system from it: the emitter's speed, lifespan and size, the
+drag modifier's damping, the rotation modifier's spin, the spawn modifier's
+children.
+
+Blender emits from a mesh and Skyrim emits from a volume or from a named mesh,
+so the system is put on the object a mesh emitter names, or on a wire primitive
+matching the box, cylinder or sphere the emitter describes. Over 40 of the
+game's effect meshes — 125 systems, all four emitter kinds — every one builds.
+
+It is one direction, and deliberately. Blender's particle system is not a
+superset of Skyrim's: there is no cone half-angle, and colour and size over a
+particle's life live on the material rather than on the system. Those are
+**reported on the console** rather than approximated, because a flat value in
+place of a curve looks like a translation and behaves like a guess. The
+properties stay on the nodes either way, so nothing is lost by not reading them
+— `Clear Particle Systems` puts the scene back.
+
+One thing worth knowing: a Skyrim system with no gravity modifier gets
+`effector_weights.gravity = 0`. Blender pulls every particle down by default and
+Skyrim does not, so a faithful build has to turn that off — and a gravity
+modifier that *is* present almost always stores a strength of zero and takes its
+real value from a controller, which is in the animation and not in the scene.
 
 ## Two things worth knowing
 

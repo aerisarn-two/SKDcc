@@ -15,6 +15,7 @@ would look like a translation and behave like a guess.
 import math
 
 import bpy
+from mathutils import Vector
 
 from . import schema
 
@@ -249,18 +250,7 @@ def _apply_modifiers(settings, modifiers, system_node, report):
 
         if kind == schema.GRAVITY:
             has_gravity = True
-            strength = _float(modifier, schema.STRENGTH, 0.0)
-
-            # Vanilla stores zero here and animates it, so a zero is not an
-            # absence -- it is a modifier waiting for its controller.
-            settings.effector_weights.gravity = 1.0 if strength else 0.0
-
-            if not strength:
-                report.notes.append(
-                    f"{system_node.name}: has a gravity modifier whose strength is "
-                    "zero, which is how every vanilla one ships -- the value lives "
-                    "in a NiPSysGravityStrengthCtlr and is not in the scene"
-                )
+            _gravity_field(modifier, system_node, report)
 
         elif kind == schema.DRAG:
             settings.damping = min(1.0, max(0.0, _float(modifier, schema.PERCENTAGE, 0.0)))
@@ -291,11 +281,82 @@ def _apply_modifiers(settings, modifiers, system_node, report):
                 "its keys are still on the node and nothing here reads them"
             )
 
-    # Blender pulls every particle down with scene gravity; Skyrim does not
-    # unless a modifier says so. A system with no gravity modifier that falls in
-    # Blender is not the effect that was exported.
+    # Scene gravity is off either way. Blender pulls every particle down by
+    # default and Skyrim has no such default: what a Skyrim system has instead
+    # is whatever its gravity modifier says, along the axis that modifier names,
+    # which is a field of its own and not a weight on this one. A campfire's
+    # flames lift along +Z at 112.5 and its smoke at 7.2; run them under scene
+    # gravity and the fire falls into the ground.
+    settings.effector_weights.gravity = 0.0
+
     if not has_gravity:
-        settings.effector_weights.gravity = 0.0
+        return
+
+
+def _vector(modifier, name, fallback=(0.0, 0.0, 1.0)):
+    """A three-number property, which arrives as a string of three numbers."""
+    raw = _get(modifier, name, None)
+
+    if raw is None:
+        return fallback
+
+    try:
+        parts = [float(p) for p in str(raw).replace(",", " ").split()]
+    except ValueError:
+        return fallback
+
+    return tuple(parts[:3]) if len(parts) >= 3 else fallback
+
+
+def _gravity_field(modifier, system_node, report):
+    """A gravity modifier, as the force field Blender would call it.
+
+    Not ``effector_weights.gravity``: that turns on *Blender's* gravity, which
+    points down at 9.81 and knows nothing about the axis the modifier names. A
+    Skyrim gravity modifier is a constant acceleration along its own axis and
+    lifts as often as it drops -- flames and smoke both rise -- so it becomes a
+    wind field pointed along that axis, or a point force where the modifier says
+    Force Type 1.
+    """
+    strength = _float(modifier, schema.STRENGTH, 0.0)
+
+    if not strength:
+        # Vanilla stores zero here and animates it: of the 615 gravity modifiers
+        # in the game's effect folders every one is zero, and 72 take their real
+        # value from a NiPSysGravityStrengthCtlr. A zero is a modifier waiting
+        # for its controller, not an absence, and the controller is in the
+        # animation rather than in the scene.
+        report.notes.append(
+            f"{system_node.name}: its gravity modifier stores a strength of zero, "
+            "which is how the game's effect meshes ship -- the value is in a "
+            "NiPSysGravityStrengthCtlr and no field is built for it"
+        )
+
+        return None
+
+    point = int(_float(modifier, schema.FORCE_TYPE, 0.0)) == 1
+    axis = _vector(modifier, schema.GRAVITY_AXIS)
+
+    bpy.ops.object.effector_add(type="FORCE" if point else "WIND")
+    field = bpy.context.object
+    field.name = f"{system_node.name}_gravity"
+    field.field.strength = strength
+
+    if not point:
+        # A wind field blows along its own +Z, so the object is turned to put
+        # +Z on the axis the modifier names.
+        field.rotation_mode = "QUATERNION"
+        field.rotation_quaternion = Vector((0.0, 0.0, 1.0)).rotation_difference(
+            Vector(axis).normalized() if Vector(axis).length > 1e-9 else Vector((0.0, 0.0, 1.0))
+        )
+
+    field.parent = system_node
+    field.matrix_parent_inverse.identity()
+    field.hide_render = True
+    field[schema.GENERATED] = 1
+    field[schema.SOURCE] = system_node.name
+
+    return field
 
 
 def build_system(system_node, scene, scene_objects, report):

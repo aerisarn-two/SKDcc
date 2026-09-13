@@ -1,0 +1,13 @@
+schema_version = "1.0.0"
+
+id = "skyrim_import_scale"
+version = "0.1.0"
+name = "Skyrim Import Scale"
+tagline = "Rescale objects Blender's FBX importer leaves at the wrong size"
+maintainer = "Aerisarn <aerisarn@gmail.com>"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
+
+tags = ["Import-Export", "Object"]

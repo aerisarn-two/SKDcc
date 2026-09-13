@@ -52,6 +52,16 @@ else
     echo "== blender particles: skipped, pass an effect FBX as the second argument =="
 fi
 
+# The import repair works on anything converted, so it runs against whichever
+# file was given.
+if [ "$#" -ge 1 ]; then
+    echo
+    echo "== blender import scale (live) =="
+    "$blender" --background --python "$here/run_scale_in_blender.py" -- "$1" 2>&1 \
+        | grep -E '^(PASS|FAIL|     )|checks failed|FAILED:'
+    failures=$((failures + ${PIPESTATUS[0]}))
+fi
+
 echo
 echo "$failures failure(s)"
 exit "$failures"

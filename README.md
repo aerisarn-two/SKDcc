@@ -7,6 +7,7 @@ constraints the DCC can actually use, and write them back when you are done.
 | --- | --- | --- |
 | [`blender/skyrim_havok_constraints`](blender/skyrim_havok_constraints) | add-on, `RigidBodyConstraint` + `LIMIT_ROTATION` | in Blender 5.0.1 |
 | [`blender/skyrim_particles`](blender/skyrim_particles) | add-on, Blender particle systems | in Blender 5.0.1, over 125 systems |
+| [`blender/skyrim_import_scale`](blender/skyrim_import_scale) | add-on, one button | in Blender 5.0.1 |
 | [`maya/`](maya) | `maya.cmds`, Bullet six-DOF + `transformLimits` | fixture only |
 | [`max/`](max) | `pymxs`, MassFX `UConstraint` + rotation limits | fixture only |
 
@@ -59,6 +60,30 @@ TD tuning a ragdoll wants.
 back into the properties the exporters read.
 
 Both build paths are reversible and neither touches a property.
+
+## Import scale
+
+**`Properties ▸ Object ▸ Fix Hidden Object Scale`.** Blender's FBX importer
+converts the file's units into the scene's — a NIF arrives in centimetres and
+Blender works in metres, so everything is scaled by 0.01 on the way in — and it
+does not do that for an object it imports **hidden**. Those keep world scale 1.0
+and come out a hundred times too big.
+
+Every collision proxy is hidden, and so is every node the NIF marks invisible, so
+a converted mesh routinely opens with a correctly sized model sitting inside a
+proxy a hundred times its size:
+
+```
+DaedricDagger_dd_0_support   0.0100   visible
+DaedricDagger_rb_convex      1.0000   hidden
+EdgeBlood25_support          1.0000   hidden
+```
+
+The file is not at fault. Every one of those nodes has `Lcl Scaling = 1` under a
+root of scale 1, and stripping the visibility flags alone — changing nothing else
+— brings all six back to 0.01. The repair recomputes the world matrix the way
+Blender itself would, from the parent the object already has, so no factor is
+written down and an object that was already right does not move.
 
 ## Particles
 

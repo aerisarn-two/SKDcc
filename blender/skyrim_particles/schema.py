@@ -44,6 +44,9 @@ DECLINATION_VARIATION = "declination_variation"
 PLANAR_ANGLE = "planar_angle"
 PLANAR_ANGLE_VARIATION = "planar_angle_variation"
 INITIAL_RADIUS = "initial_radius"
+
+# On NiPSysData: "Sets aspect ratio for Subtexture Offset UV quads".
+ASPECT_RATIO = "npsd_aspect_ratio"
 RADIUS_VARIATION = "radius_variation"
 LIFE_SPAN = "life_span"
 LIFE_SPAN_VARIATION = "life_span_variation"

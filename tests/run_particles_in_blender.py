@@ -162,6 +162,19 @@ def main():
         if sprite is not None:
             check(f"{node.name} sprite is UV mapped", len(sprite.data.uv_layers) > 0, True)
 
+            # And it is the shape the file says. NiPSysData carries an aspect
+            # ratio -- the campfire's fire column says 0.5 against atlas cells
+            # 64 wide by 128 tall -- and a square quad drew that artwork at
+            # twice its width, which is what made every flame a rectangle.
+            aspect = float(node.get(schema.ASPECT_RATIO, 1.0) or 1.0)
+            width = max(v.co[0] for v in sprite.data.vertices) - \
+                min(v.co[0] for v in sprite.data.vertices)
+            height = max(v.co[2] for v in sprite.data.vertices) - \
+                min(v.co[2] for v in sprite.data.vertices)
+
+            check(f"{node.name} sprite is the file's shape",
+                  round(width / height, 3), round(aspect, 3))
+
     # It has to actually simulate, played in order. Jumping frames does not step
     # a simulation zone, so this walks them.
     counts = {}

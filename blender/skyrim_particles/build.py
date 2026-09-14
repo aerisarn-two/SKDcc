@@ -957,6 +957,7 @@ def _simulation_settings(system_node, emitter, scene, report, units):
         # scene with no camera has to settle for.
         "camera": scene.camera,
         "size": max(_float(emitter, schema.INITIAL_RADIUS, 1.0), 1e-4),
+        "aspect": _aspect(system_node),
         "scale_over_life": _scale_curve(system_node),
     }
 
@@ -1032,6 +1033,27 @@ def _gravity_vector(system_node):
     return tuple(total)
 
 
+def _aspect(system_node):
+    """How wide the quad is against its height, from ``NiPSysData``.
+
+    nif.xml: "Sets aspect ratio for Subtexture Offset UV quads". It is not
+    decoration -- the campfire's fire column says 0.5 and its atlas cells are 64
+    pixels wide by 128 tall, exactly that. Drawn on a square quad the artwork
+    comes out at twice its width, which is what made every flame a rectangle.
+
+    Across the two samples it runs 0.5, 0.6, 0.9 and 1.25, so it is a shape each
+    system chooses rather than a constant worth ignoring.
+    """
+    return max(_float_str(system_node.get(schema.ASPECT_RATIO), 1.0), 1e-3)
+
+
+def _float_str(value, fallback):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
 def _sprite(scene, system_node, settings):
     """The quad each particle is.
 
@@ -1044,11 +1066,16 @@ def _sprite(scene, system_node, settings):
     if existing is not None:
         return existing
 
+    # The radius gives the height and the aspect narrows or widens it. Which of
+    # the two dimensions the radius pins is not in the file; height is the one
+    # that makes the artwork come out its own shape, since a flame column's
+    # cells are taller than they are wide and the aspect matches that exactly.
     half = settings["size"]
+    wide = half * settings["aspect"]
 
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(
-        [(-half, 0.0, -half), (half, 0.0, -half), (half, 0.0, half), (-half, 0.0, half)],
+        [(-wide, 0.0, -half), (wide, 0.0, -half), (wide, 0.0, half), (-wide, 0.0, half)],
         [],
         [(0, 1, 2, 3)],
     )

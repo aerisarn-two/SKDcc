@@ -218,13 +218,31 @@ def _volume_for(emitter, kind, name):
     return obj
 
 
+def _units_of(obj):
+    """How many Blender units one of the file's units is worth, here.
+
+    A NIF is in the game's own units and Blender imports it into metres, so
+    every length in a particle's fields -- a speed, a radius, an acceleration --
+    is a hundred times what it should be if it is used as it stands. The factor
+    is not written down anywhere in this add-on: it is the world scale the
+    frame already has, which is whatever the importer decided and stays right if
+    that ever changes.
+
+    The average of the three axes, because a node may be scaled unevenly and a
+    speed has only one number.
+    """
+    scale = obj.matrix_world.to_scale()
+
+    return (abs(scale[0]) + abs(scale[1]) + abs(scale[2])) / 3.0
+
+
 def _seconds_to_frames(scene, seconds):
     fps = scene.render.fps / max(scene.render.fps_base, 1e-6)
 
     return max(1, int(round(seconds * fps)))
 
 
-def _apply_emitter(settings, emitter, system_node, scene, report):
+def _apply_emitter(settings, emitter, system_node, scene, report, units):
     """Speed, life and size: the four fields every Skyrim emitter carries."""
     life = _float(emitter, schema.LIFE_SPAN, 1.0)
     settings.lifetime = _seconds_to_frames(scene, life)
@@ -249,7 +267,7 @@ def _apply_emitter(settings, emitter, system_node, scene, report):
     # A mesh emitter is the exception the engine makes too: with
     # VELOCITY_USE_NORMALS it births along the surface normal, and there
     # normal_factor is exactly right.
-    speed = _float(emitter, schema.SPEED, 0.0)
+    speed = _float(emitter, schema.SPEED, 0.0) * units
     kind = _get(emitter, schema.MODIFIER, "")
 
     along_normals = (
@@ -264,14 +282,17 @@ def _apply_emitter(settings, emitter, system_node, scene, report):
         settings.normal_factor = 0.0
         settings.object_align_factor = tuple(a * speed for a in schema.EMISSION_AXIS)
 
-    settings.factor_random = _float(emitter, schema.SPEED_VARIATION, 0.0)
+    settings.factor_random = _float(emitter, schema.SPEED_VARIATION, 0.0) * units
 
-    radius = _float(emitter, schema.INITIAL_RADIUS, 1.0)
-    settings.particle_size = max(radius, 1e-4)
+    radius = _float(emitter, schema.INITIAL_RADIUS, 1.0) * units
+    settings.particle_size = max(radius, 1e-6)
 
     if radius > 0.0:
+        # A ratio, so the units cancel and only the two raw numbers matter.
         variation = _float(emitter, schema.RADIUS_VARIATION, 0.0)
-        settings.size_random = min(1.0, max(0.0, variation / radius))
+        settings.size_random = min(
+            1.0, max(0.0, variation / _float(emitter, schema.INITIAL_RADIUS, 1.0))
+        )
 
     # The buffer the engine fills is the particle budget: NiPSysData holds no
     # vertices on disk, only the capacity for them.
@@ -295,7 +316,7 @@ def _apply_emitter(settings, emitter, system_node, scene, report):
         )
 
 
-def _apply_modifiers(settings, modifiers, system_node, report):
+def _apply_modifiers(settings, modifiers, system_node, report, units):
     """The rest of the stack, where Blender has somewhere to put it."""
     has_gravity = False
 
@@ -307,7 +328,7 @@ def _apply_modifiers(settings, modifiers, system_node, report):
 
         if kind == schema.GRAVITY:
             has_gravity = True
-            _gravity_field(modifier, system_node, report)
+            _gravity_field(modifier, system_node, report, units)
 
         elif kind == schema.DRAG:
             settings.damping = min(1.0, max(0.0, _float(modifier, schema.PERCENTAGE, 0.0)))
@@ -365,7 +386,7 @@ def _vector(modifier, name, fallback=(0.0, 0.0, 1.0)):
     return tuple(parts[:3]) if len(parts) >= 3 else fallback
 
 
-def _gravity_field(modifier, system_node, report):
+def _gravity_field(modifier, system_node, report, units):
     """A gravity modifier, as the force field Blender would call it.
 
     Not ``effector_weights.gravity``: that turns on *Blender's* gravity, which
@@ -375,7 +396,7 @@ def _gravity_field(modifier, system_node, report):
     wind field pointed along that axis, or a point force where the modifier says
     Force Type 1.
     """
-    strength = _float(modifier, schema.STRENGTH, 0.0)
+    strength = _float(modifier, schema.STRENGTH, 0.0) * units
 
     if not strength:
         # Vanilla stores zero here and animates it: of the 615 gravity modifiers
@@ -474,8 +495,13 @@ def build_system(system_node, scene, scene_objects, report):
     settings.frame_start = scene.frame_start
     settings.frame_end = scene.frame_end
 
-    _apply_emitter(settings, emitter, system_node, scene, report)
-    _apply_modifiers(settings, modifiers_of(system_node), system_node, report)
+    # Everything with a length in it is in the file's units and the scene is in
+    # Blender's, so the frame's own scale converts them. Taken from the node
+    # rather than from the carrier, whose scale carries the emitter's volume.
+    units = _units_of(system_node)
+
+    _apply_emitter(settings, emitter, system_node, scene, report, units)
+    _apply_modifiers(settings, modifiers_of(system_node), system_node, report, units)
 
     settings[schema.GENERATED] = 1
     settings[schema.SOURCE] = system_node.name

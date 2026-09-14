@@ -78,12 +78,28 @@ def main():
 
         life = float(emitter.get(schema.LIFE_SPAN, 1.0))
         check(f"{node.name} lifetime", carrier.lifetime, max(1, int(round(life * fps))))
-        check(f"{node.name} speed", carrier.normal_factor, float(emitter.get(schema.SPEED, 0.0)))
+
+        # Lengths are in the file's units and the scene is in Blender's, so the
+        # frame's own world scale is what converts them. Taken straight off the
+        # matrix here rather than from the add-on, so the two have to agree
+        # rather than agreeing with themselves.
+        scale = node.matrix_world.to_scale()
+        units = (abs(scale[0]) + abs(scale[1]) + abs(scale[2])) / 3.0
+
+        speed = float(emitter.get(schema.SPEED, 0.0))
+        moving = max(abs(v) for v in carrier.object_align_factor) or carrier.normal_factor
+
+        check(f"{node.name} speed", round(moving, 5), round(speed * units, 5))
         check(
             f"{node.name} size",
-            carrier.particle_size,
-            max(float(emitter.get(schema.INITIAL_RADIUS, 1.0)), 1e-4),
+            round(carrier.particle_size, 5),
+            round(max(float(emitter.get(schema.INITIAL_RADIUS, 1.0)) * units, 1e-6), 5),
         )
+
+        # And the thing that was wrong: a speed used as it stands is a hundred
+        # times too fast, so it must not be the file's number.
+        if speed > 0 and units < 0.5:
+            check(f"{node.name} speed is converted", moving != speed, True)
 
         # A system with no gravity modifier must not fall: Blender applies scene
         # gravity to every particle and Skyrim does not.

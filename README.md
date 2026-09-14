@@ -110,6 +110,15 @@ so the system is put on the object a mesh emitter names, or on a wire primitive
 matching the box, cylinder or sphere the emitter describes. Over 40 of the
 game's effect meshes — 125 systems, all four emitter kinds — every one builds.
 
+**Units are converted, not copied.** A NIF is in the game's own units and
+Blender imports it into metres, so a speed of 210 used as it stands is 210 m/s
+and the splinters leave the windmill like bullets. Every length — speed, radius,
+the acceleration a gravity modifier carries — is multiplied by the world scale
+the emitter's own frame already has, so the factor is never written down here
+and stays right if the importer ever changes what it does. The windmill's
+splinters come out at 2.1 m/s under a gravity of 9.0 m/s², which is the game's
+own constant landing on Earth's.
+
 **Import effects with Automatic Bone Orientation off.** An emitter's frame is
 often a bone — NIFBX writes a node as a `LimbNode` where the NIF has it in a
 skeleton, and Blender turns every LimbNode into a bone — and that option

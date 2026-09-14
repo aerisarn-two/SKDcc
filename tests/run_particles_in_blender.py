@@ -148,6 +148,18 @@ def main():
                 check(f"{node.name} emits at the file's rate",
                       round(effective / rate, 1), 1.0)
 
+        # A rate that lives in the clip rather than on the node. NIFBX mirrors it
+        # onto the node because Blender keeps none of an animation stack's user
+        # properties, and without it the waterwheel emitted one particle a frame
+        # -- 24 a second against the 90 its file asks for.
+        clip_rate = build.sequenced_rate(node)
+
+        if emission is None and clip_rate is not None:
+            effective = settings["per_frame"] * fps / max(settings["period"], 1)
+
+            check(f"{node.name} births at the clip's rate",
+                  round(effective / clip_rate, 1), 1.0)
+
         # A system with no gravity modifier must not fall: Blender applies scene
         # gravity to everything and Skyrim does not.
         kinds = {m.get(schema.MODIFIER, "") for m in build.modifiers_of(node)}

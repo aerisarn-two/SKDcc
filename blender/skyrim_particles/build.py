@@ -376,6 +376,35 @@ def emission_of(system_node):
     return None
 
 
+def sequenced_rate(system_node):
+    """The birth rate of an emitter controller that belongs to a clip, or None.
+
+    A controller a sequence drives keeps its value in an interpolator with no
+    data, and in the file that value sits on the animation stack rather than on
+    the node -- rightly, since the next sequence can say something else. Blender
+    keeps none of a stack's user properties, so NIFBX mirrors a particle
+    system's onto the node and this is where they are read.
+
+    Without it the lumbermill's waterwheel had no rate at all and fell back to
+    one particle a frame: 24 a second against the 90 its file asks for.
+    """
+    best = None
+
+    for key in system_node.keys():
+        if not key.startswith(schema.SEQUENCED_PREFIX):
+            continue
+
+        if not key.endswith(schema.SEQUENCED_BIRTH_RATE):
+            continue
+
+        value = _as_float(_get(system_node, key), None)
+
+        if value is not None and value > 0.0:
+            best = value if best is None else max(best, value)
+
+    return best
+
+
 def cycle_of(system_node):
     """How the emitter controller repeats: LOOP, REVERSE, CLAMP, or None.
 
@@ -719,13 +748,25 @@ def _simulation_settings(system_node, emitter, scene, report, units):
                     cycle = turn
                     last = scene.frame_end
     else:
-        first, last, rate = scene.frame_start, scene.frame_end, 0.0
+        first, last = scene.frame_start, scene.frame_end
+        rate = sequenced_rate(system_node)
 
-        if any(k.startswith(schema.SEQUENCED_EMITTER) for k in system_node.keys()):
+        if rate is None:
+            rate = 0.0
+
+            if any(k.startswith(schema.SEQUENCED_EMITTER) for k in system_node.keys()):
+                report.notes.append(
+                    f"{system_node.name}: its emitter controller belongs to an animation "
+                    "and carries no rate, so this emits over the whole timeline at one "
+                    "particle a frame"
+                )
+        else:
+            # The clip is what runs the effect, and a looping one runs forever --
+            # which for an emitter that is on for the whole of it means emitting
+            # for the whole timeline, which is what `first`/`last` already say.
             report.notes.append(
                 f"{system_node.name}: its emitter controller belongs to an animation, "
-                "so the emission window is in that clip rather than on the node -- "
-                "emitting over the whole timeline instead"
+                f"which births {rate:g} a second"
             )
 
     # A rate per second becomes a count per frame -- and most of these are

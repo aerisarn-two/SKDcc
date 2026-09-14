@@ -197,6 +197,13 @@ WINDOW_KEY_COUNT = WINDOW + "num_keys"
 SEQUENCED_PREFIX = "nac_"
 SEQUENCED_EMITTER = SEQUENCED_PREFIX + EMITTER_CTLR
 
+#: What a sequenced controller's constants are called on the node. NIFBX mirrors
+#: them there because they live on the animation stack in the file, and Blender
+#: keeps none of a stack's user properties.
+SEQUENCED_BIRTH_RATE = "BirthRate"
+SEQUENCED_EMITTER_ACTIVE = "EmitterActive"
+SEQUENCED_FLAGS_SUFFIX = "_flags"
+
 #: What NIFBX calls a node a DCC tool built for itself. Anything this add-on
 #: creates carries it, so converting the scene back does not turn the
 #: scaffolding into model -- an emitter volume, a force field and a sprite are

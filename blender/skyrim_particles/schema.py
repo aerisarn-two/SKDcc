@@ -161,6 +161,12 @@ MULTI_TARGET_EMITTER_CTLR = "BSPSysMultiTargetEmitterCtlr"
 START_TIME = "start_time"
 STOP_TIME = "stop_time"
 
+# Bits 1-2 of a NiTimeController's flags word.
+CTLR_FLAGS = "flags"
+CYCLE_LOOP = "LOOP"
+CYCLE_REVERSE = "REVERSE"
+CYCLE_CLAMP = "CLAMP"
+
 #: The birth rate, in particles per second. Almost always a bare value with no
 #: data block behind it -- 1,600 of the game's 1,704 emitter controllers -- so
 #: the interpolator's own ``value`` is the rate.
@@ -179,3 +185,12 @@ WINDOW_KEY_COUNT = WINDOW + "num_keys"
 #: animation rather than on the node.
 SEQUENCED_PREFIX = "nac_"
 SEQUENCED_EMITTER = SEQUENCED_PREFIX + EMITTER_CTLR
+
+#: What NIFBX calls a node a DCC tool built for itself. Anything this add-on
+#: creates carries it, so converting the scene back does not turn the
+#: scaffolding into model -- an emitter volume, a force field and a sprite are
+#: things Blender needs to show the effect and things the NIF has never heard of.
+#:
+#: Owned by NIFBX (``FbxNodeType.GeneratedProperty``) rather than by this add-on,
+#: so a second tool needs no second rule.
+DCC_GENERATED = "skdcc_generated"

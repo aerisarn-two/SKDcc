@@ -3,9 +3,9 @@
     blender --background --python tests/run_particles_in_blender.py -- some.fbx
 
 Imports the FBX, runs the add-on, and checks that what came out says what the
-properties said. The point is not that it runs: it is that the numbers on the
-Blender system are the numbers in the file, converted where units differ and
-carried where they do not.
+properties said. The point is not that it runs: it is that the numbers in the
+simulation are the numbers in the file, converted where units differ and carried
+where they do not, and that the thing actually simulates.
 """
 
 import os
@@ -16,7 +16,7 @@ import bpy
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "blender"))
 
-from skyrim_particles import build, schema  # noqa: E402
+from skyrim_particles import build, schema, simulation  # noqa: E402
 
 failures = []
 
@@ -47,6 +47,10 @@ def main():
         return
 
     report = build.build(scene)
+
+    # So every matrix read below is where things actually are.
+    bpy.context.view_layer.update()
+
     print(f"     {report}")
 
     for line in report.notes:
@@ -57,7 +61,10 @@ def main():
 
     check("systems built", len(report.systems) > 0, True)
 
-    # Every built system's numbers against the emitter they came from.
+    # Nothing may fail to build: the per-system checks below pass over a name
+    # that is not in the report, so a system that died would leave them green.
+    check("none skipped", report.skipped, [])
+
     fps = scene.render.fps / max(scene.render.fps_base, 1e-6)
 
     for node in systems:
@@ -66,18 +73,14 @@ def main():
         if emitter is None or node.name not in report.systems:
             continue
 
-        carrier = None
+        host = bpy.data.objects.get(f"{node.name}_particles")
+        check(f"{node.name} has a simulation", host is not None, True)
 
-        for obj in scene.objects:
-            for system in obj.particle_systems:
-                if system.name == node.name:
-                    carrier = system.settings
-
-        if carrier is None:
+        if host is None:
             continue
 
-        life = float(emitter.get(schema.LIFE_SPAN, 1.0))
-        check(f"{node.name} lifetime", carrier.lifetime, max(1, int(round(life * fps))))
+        group = host.modifiers[0].node_group
+        check(f"{node.name} group", group is not None, True)
 
         # Lengths are in the file's units and the scene is in Blender's, so the
         # frame's own world scale is what converts them. Taken straight off the
@@ -86,87 +89,136 @@ def main():
         scale = node.matrix_world.to_scale()
         units = (abs(scale[0]) + abs(scale[1]) + abs(scale[2])) / 3.0
 
+        settings = build._simulation_settings(node, emitter, scene, report, units)
+
+        life = float(emitter.get(schema.LIFE_SPAN, 1.0))
+        check(f"{node.name} life", settings["life"], max(life, 1e-3))
+
+        # The speed goes in as the file states it, because the simulation runs
+        # inside the emitter's own frame and that frame carries the file-to-scene
+        # scale. Converting first applied it twice, which put every particle
+        # within a hundredth of the origin travelling a hundredth of its speed.
         speed = float(emitter.get(schema.SPEED, 0.0))
-        moving = max(abs(v) for v in carrier.object_align_factor) or carrier.normal_factor
+        check(f"{node.name} speed", round(settings["speed"], 5), round(speed, 5))
 
-        check(f"{node.name} speed", round(moving, 5), round(speed * units, 5))
-        check(
-            f"{node.name} size",
-            round(carrier.particle_size, 5),
-            round(max(float(emitter.get(schema.INITIAL_RADIUS, 1.0)) * units, 1e-6), 5),
-        )
+        # So the conversion still has to happen, and this is where: the host the
+        # simulation runs on carries the same scale the node does. A speed of 54
+        # game units a second through a scale of 0.012 is 0.65 metres a second,
+        # and a host at scale one would be a hundred times too fast.
+        if speed > 0:
+            host_scale = host.matrix_world.to_scale()
+            average = (abs(host_scale[0]) + abs(host_scale[1]) + abs(host_scale[2])) / 3.0
 
-        # And the thing that was wrong: a speed used as it stands is a hundred
-        # times too fast, so it must not be the file's number.
-        if speed > 0 and units < 0.5:
-            check(f"{node.name} speed is converted", moving != speed, True)
+            check(f"{node.name} host carries the units", round(average, 5), round(units, 5))
+            check(f"{node.name} units are not one", average < 0.5, True)
 
-        # The emission window, which is the thing a Blender pass used to lose
-        # entirely: the emitter controller went into an animation stack and
-        # Blender does not import curves on custom properties.
+        # The emission window, which used to be the whole scene: a campfire that
+        # emits for 3.3 seconds ran for 250 frames.
         emission = build.emission_of(node)
 
         if emission is not None:
             start, stop, rate = emission
 
-            check(
-                f"{node.name} emission starts",
-                carrier.frame_start,
-                scene.frame_start + int(round(start * fps)),
-            )
+            check(f"{node.name} emission starts",
+                  settings["start_frame"], scene.frame_start + int(round(start * fps)))
 
-            if stop is not None and stop > start:
-                check(
-                    f"{node.name} emission ends",
-                    carrier.frame_end,
-                    scene.frame_start + int(round(stop * fps)),
-                )
+            turn = scene.frame_start + int(round(stop * fps)) if stop else None
+            loops = build.cycle_of(node) in ("LOOP", "REVERSE")
 
-                # Not the whole scene, which is what it was before the window
-                # travelled -- a campfire emitting for 3.3 seconds ran for 250
-                # frames.
-                check(
-                    f"{node.name} window is not the scene",
-                    carrier.frame_end < scene.frame_end,
-                    True,
-                )
+            if stop is not None and stop > start and not loops:
+                check(f"{node.name} emission ends", settings["end_frame"], turn)
+                check(f"{node.name} window is not the scene",
+                      settings["end_frame"] < scene.frame_end, True)
 
-                # The count is a number emitted over the window, where the file
-                # gives a rate per second, bounded by the engine's buffer.
-                if rate > 0:
-                    check(
-                        f"{node.name} count",
-                        carrier.count,
-                        max(1, int(round(rate * (stop - start)))),
-                    )
+            if loops and turn is not None and turn < scene.frame_end:
+                # It emits for its span, goes back and does it again. Reading
+                # the span as a one-shot put the campfire out at frame 101 of
+                # 250 and its last ember died at 161.
+                check(f"{node.name} keeps emitting", settings["end_frame"], scene.frame_end)
+                check(f"{node.name} one turn is the span",
+                      settings["cycle"], turn - settings["start_frame"])
 
-                    # And that the buffer is not what it is. The buffer sizes
-                    # the particles alive at once, so a flame emitting 15 a
-                    # second for 3.3 of them emits 50, whatever its buffer of
-                    # nine says.
-                    budget = int(float(node.get(schema.MAX_VERTICES, 0)) or 0)
+            if rate > 0:
+                # The rate the simulation actually emits at, not the per-frame
+                # count: an emitter slower than the frame rate spawns one every
+                # few frames, and rounding that up to one per frame emitted
+                # three times too many for the campfire's embers.
+                effective = settings["per_frame"] * fps / max(settings["period"], 1)
 
-                    if budget and rate * (stop - start) > budget:
-                        check(f"{node.name} count is not the buffer", carrier.count > budget, True)
+                check(f"{node.name} emits at the file's rate",
+                      round(effective / rate, 1), 1.0)
 
         # A system with no gravity modifier must not fall: Blender applies scene
-        # gravity to every particle and Skyrim does not.
+        # gravity to everything and Skyrim does not.
         kinds = {m.get(schema.MODIFIER, "") for m in build.modifiers_of(node)}
 
         if schema.GRAVITY not in kinds:
-            check(f"{node.name} gravity off", carrier.effector_weights.gravity, 0.0)
+            check(f"{node.name} no gravity", settings["gravity"], (0.0, 0.0, 0.0))
+
+        # The quad the particles are drawn as, sized by the emitter's radius.
+        sprite = bpy.data.objects.get(f"{node.name}_sprite")
+        check(f"{node.name} has a sprite", sprite is not None, True)
+
+        if sprite is not None:
+            check(f"{node.name} sprite is UV mapped", len(sprite.data.uv_layers) > 0, True)
+
+    # It has to actually simulate, played in order. Jumping frames does not step
+    # a simulation zone, so this walks them.
+    counts = {}
+
+    for frame in range(scene.frame_start, scene.frame_start + 60):
+        scene.frame_set(frame)
+        graph = bpy.context.evaluated_depsgraph_get()
+        graph.update()
+        counts[frame] = sum(1 for o in graph.object_instances if o.is_instance)
+
+    early = counts[scene.frame_start]
+    later = counts[scene.frame_start + 40]
+
+    print(f"     instances: frame {scene.frame_start} -> {early}, "
+          f"frame {scene.frame_start + 40} -> {later}")
+
+    check("particles accumulate", later > early, True)
+
+    # Still burning at the end. A looping emitter has to reach the last frame:
+    # the count is taken there rather than trusting the settings.
+    looping = [n for n in systems if build.cycle_of(n) in ("LOOP", "REVERSE")
+               and n.name in report.systems]
+
+    if looping:
+        for frame in range(scene.frame_start + 60, scene.frame_end + 1):
+            scene.frame_set(frame)
+            graph = bpy.context.evaluated_depsgraph_get()
+            graph.update()
+
+        alive = sum(1 for o in graph.object_instances if o.is_instance)
+        print(f"     instances at the last frame {scene.frame_end}: {alive}")
+        check("a looping emitter is still going at the end", alive > 0, True)
+
+    # And the age reaches the shader, which is the whole reason for the
+    # simulation: Eevee does not implement the Particle Info node, so a fade
+    # driven from it renders nothing at all.
+    published = any(
+        node.type == "STORE_NAMED_ATTRIBUTE"
+        and node.inputs["Name"].default_value == simulation.PARTICLE_AGE
+        for group in bpy.data.node_groups
+        for node in group.nodes
+    )
+
+    check("the age is published for the shader", published, True)
 
     # And taking it away leaves the scene as it was found.
     before = len(scene.objects)
     removed = build.clear(scene)
     check("cleared", removed > 0, True)
-    check("volumes removed", len(scene.objects) <= before, True)
-
-    remaining = sum(len(o.particle_systems) for o in scene.objects)
-    check("no systems left", remaining, 0)
+    check("volumes removed", len(scene.objects) < before, True)
 
 
 main()
 
-print(f"{len(failures)} checks failed" if failures else "0 checks failed")
-sys.exit(1 if failures else 0)
+print(f"\n{len(failures)} checks failed")
+
+if failures:
+    print("FAILED: " + ", ".join(failures))
+
+sys.exit(len(failures))

@@ -17,7 +17,11 @@ import math
 import bpy
 from mathutils import Vector
 
-from . import schema
+from . import schema, simulation
+
+
+#: The material an emitter volume wears so that it emits without being seen.
+INVISIBLE_MATERIAL = "skp_emitter_invisible"
 
 
 class Report:
@@ -211,11 +215,67 @@ def _volume_for(emitter, kind, name):
         obj = bpy.context.object
 
     obj.name = name
-    obj.display_type = "WIRE"
-    obj.hide_render = True
     obj[schema.GENERATED] = 1
+    obj[schema.DCC_GENERATED] = 1
+
+    # Not "WIRE", tempting as it is for a box nobody wants to look at. An
+    # object's display type governs how its *particle instances* are drawn as
+    # well as the object, so a wireframe emitter draws every particle it emits
+    # as a wireframe too -- an effect whose flames are black outlined rectangles
+    # hanging in the air, which is exactly what it looked like.
+    #
+    # The box is kept out of the way by the material it wears instead: see
+    # `_invisible`. That leaves it invisible wherever materials are shown and a
+    # plain box in solid shading, which is the right way round -- the fire is
+    # what someone is looking at.
+    obj.display_type = "TEXTURED"
+
+    # Shown as a wireframe rather than hidden from the render. Hiding an object
+    # from the render takes its particle systems with it -- measured: an emitter
+    # with `hide_render` set renders no particles at all -- so a volume hidden
+    # this way produced an effect that was correct in every number and invisible.
+    #
+    # What should not be drawn is the box, and Blender used to have
+    # `use_render_emitter` for exactly that. 5.0 removed it, so the box is made
+    # invisible the way anything else is: a material that is not there.
+    obj.hide_render = False
+    obj.data.materials.append(_invisible())
 
     return obj
+
+
+def _invisible():
+    """A material that renders nothing, for the emitter volume to wear.
+
+    Shared, because every volume wants the same one and a material per emitter
+    is a material per emitter to clean up.
+    """
+    existing = bpy.data.materials.get(INVISIBLE_MATERIAL)
+
+    if existing is not None:
+        return existing
+
+    material = bpy.data.materials.new(INVISIBLE_MATERIAL)
+    material.use_nodes = True
+    tree = material.node_tree
+    tree.nodes.clear()
+
+    transparent = tree.nodes.new("ShaderNodeBsdfTransparent")
+    output = tree.nodes.new("ShaderNodeOutputMaterial")
+    output.location = (260, 0)
+    tree.links.new(transparent.outputs[0], output.inputs["Surface"])
+
+    for name, value in (("blend_method", "BLEND"), ("surface_render_method", "BLENDED")):
+        if hasattr(material, name):
+            try:
+                setattr(material, name, value)
+            except (TypeError, ValueError):
+                pass
+
+    material[schema.GENERATED] = 1
+    material[schema.DCC_GENERATED] = 1
+
+    return material
 
 
 def _units_of(obj):
@@ -312,6 +372,48 @@ def emission_of(system_node):
             start, stop = on, off
 
         return start, stop, rate
+
+    return None
+
+
+def cycle_of(system_node):
+    """How the emitter controller repeats: LOOP, REVERSE, CLAMP, or None.
+
+    Bits 1-2 of the controller's flags word, and the difference between a fire
+    and a fire that goes out. The campfire's emitter runs for 3.3 seconds and
+    loops, so it burns for as long as the animation does; read as a single
+    window it emitted for a hundred frames of a two hundred and fifty frame
+    scene and the last particle died at 161.
+    """
+    for fields in _controllers(system_node):
+        if fields.get("type") not in (schema.EMITTER_CTLR, schema.MULTI_TARGET_EMITTER_CTLR):
+            continue
+
+        try:
+            flags = int(_as_float(fields.get(schema.CTLR_FLAGS), 0.0))
+        except (TypeError, ValueError):
+            return schema.CYCLE_CLAMP
+
+        return {
+            0: schema.CYCLE_LOOP,
+            1: schema.CYCLE_REVERSE,
+        }.get((flags >> 1) & 0x3, schema.CYCLE_CLAMP)
+
+    return None
+
+
+def cycle_span(system_node):
+    """The controller's own span in seconds, which is one turn of the loop.
+
+    Not the same as the emission window: the window can be a stretch inside the
+    span, and it is the span that repeats.
+    """
+    for fields in _controllers(system_node):
+        if fields.get("type") not in (schema.EMITTER_CTLR, schema.MULTI_TARGET_EMITTER_CTLR):
+            continue
+
+        return (_as_float(fields.get(schema.START_TIME), 0.0),
+                _as_float(fields.get(schema.STOP_TIME), 0.0))
 
     return None
 
@@ -650,6 +752,7 @@ def _gravity_field(modifier, system_node, report, units):
     field.matrix_parent_inverse.identity()
     field.hide_render = True
     field[schema.GENERATED] = 1
+    field[schema.DCC_GENERATED] = 1
     field[schema.SOURCE] = system_node.name
 
     return field
@@ -695,44 +798,279 @@ def build_system(system_node, scene, scene_objects, report):
 
         own = True
 
-    # Through the modifier rather than bpy.ops.object.particle_system_add: the
-    # operator wants the object selected, visible and active, and an imported
-    # effect is routinely none of those -- "Cannot edit hidden object" is what a
-    # hidden emitter mesh gets. This does the same thing and asks for nothing.
-    carrier.modifiers.new(name=system_node.name, type="PARTICLE_SYSTEM")
-
-    system = carrier.particle_systems[-1]
-    system.name = system_node.name
-    settings = system.settings
-    settings.name = f"{system_node.name}_settings"
-
-    settings.type = "EMITTER"
-    settings.physics_type = "NEWTON"
-    settings.render_type = "HALO"
-    settings.emit_from = "VOLUME" if own else "FACE"
-    settings.frame_start = scene.frame_start
-    settings.frame_end = scene.frame_end
-
-    # Everything with a length in it is in the file's units and the scene is in
-    # Blender's, so the frame's own scale converts them. Taken from the node
-    # rather than from the carrier, whose scale carries the emitter's volume.
+    # A geometry-nodes simulation rather than a particle system. Blender's
+    # particle system is legacy and every limit this add-on met was one of its
+    # own: no fade over a particle's life (Eevee does not implement the Particle
+    # Info node -- driving anything from it renders nothing at all), no
+    # billboard, no way to step an animation sheet. See `simulation`.
     units = _units_of(system_node)
+    settings = _simulation_settings(system_node, emitter, scene, report, units)
 
-    _apply_emitter(settings, emitter, system_node, scene, report, units)
+    sprite = _sprite(scene, system_node, settings)
 
-    # After the emitter, so a rate that says how many are emitted replaces the
-    # buffer size that only says how many fit.
-    _apply_emission(settings, system_node, scene, report)
+    host = bpy.data.objects.new(system_node.name + "_particles", bpy.data.meshes.new(
+        system_node.name + "_particles"))
+    scene.collection.objects.link(host)
 
-    _apply_modifiers(settings, modifiers_of(system_node), system_node, report, units)
+    # Under the system's own node, with nothing of its own. That node's frame is
+    # the one the file's numbers are in -- it carries exactly the file-to-scene
+    # scale `units` measures -- so a speed in game units put into this space
+    # comes out right in metres.
+    #
+    # Not under the emitter volume, tempting as that is for something that emits
+    # from it: a mesh emitter's carrier is a scene mesh at scene scale, and a
+    # host parented there ran the simulation at a scale of one, which is a
+    # hundred times too big. Where the emitter sits relative to the node is
+    # carried as the spawn centre instead.
+    host.parent = system_node
+    host.matrix_parent_inverse.identity()
+    host.matrix_basis.identity()
 
-    settings[schema.GENERATED] = 1
-    settings[schema.SOURCE] = system_node.name
+    settings["centre"] = tuple(
+        (system_node.matrix_world.inverted() @ carrier.matrix_world).translation)
+
+    if settings["camera"] is None:
+        report.notes.append(
+            f"{system_node.name}: no camera in the scene, so its quads face one way "
+            "rather than turning to the view -- add a camera and build again to "
+            "billboard them"
+        )
+
+    # Re-parenting does not move `matrix_world` until the depsgraph catches up,
+    # and anything reading the host before then sees where it used to be.
+    bpy.context.view_layer.update()
+
+    modifier = host.modifiers.new(name=system_node.name, type="NODES")
+    modifier.node_group = simulation.build_group(
+        f"{system_node.name}_simulation", settings, sprite)
+
+    host[schema.GENERATED] = 1
+    host[schema.DCC_GENERATED] = 1
+    host[schema.SOURCE] = system_node.name
     carrier[schema.SOURCE] = system_node.name
 
     report.systems.append(system_node.name)
 
-    return system
+    return host
+
+
+def _simulation_settings(system_node, emitter, scene, report, units):
+    """The NIF's numbers, as the simulation wants them.
+
+    Lengths are **not** converted here, unlike everywhere else in this add-on.
+    The simulation runs on a host parented into the emitter's own frame, and
+    that frame already carries the file-to-scene scale -- so a speed in the
+    game's units put into that space comes out right in metres, and converting
+    it first applies the scale twice. It did: every particle spawned within a
+    hundredth of the emitter's origin and travelled a hundredth of its speed,
+    which read as a stack of them sitting still.
+
+    ``units`` is still taken, because the sprite is a sibling rather than a
+    child and has to be sized in the same space the instances land in.
+    """
+    fps = _fps(scene)
+
+    life = _float(emitter, schema.LIFE_SPAN, 1.0)
+    spread = _float(emitter, schema.LIFE_SPAN_VARIATION, 0.0)
+
+    speed = _float(emitter, schema.SPEED, 0.0)
+    wobble = _float(emitter, schema.SPEED_VARIATION, 0.0)
+
+    emission = emission_of(system_node)
+
+    cycle = 0
+
+    if emission is not None:
+        start, stop, rate = emission
+        first = _seconds_to_frame(scene, start)
+        last = _seconds_to_frame(scene, stop) if stop is not None and stop > start \
+            else scene.frame_end
+
+        # And then again. A looping emitter controller emits for its span, goes
+        # back to the beginning and emits for it again, so its window is one
+        # turn rather than the whole of it: the campfire's is 3.3 seconds of a
+        # scene that runs for eight, and taken as a one-shot the fire went out
+        # at frame 101 and the last ember died at 161.
+        #
+        # `cycle` is how many frames a turn is; the spawn gate wraps the frame
+        # into it. The window usually fills the turn -- the emitter-active track
+        # is on from its first key to its last -- and then this is simply
+        # continuous emission, which is what a campfire does.
+        if cycle_of(system_node) in (schema.CYCLE_LOOP, schema.CYCLE_REVERSE):
+            span = cycle_span(system_node)
+
+            if span is not None and span[1] > span[0]:
+                turn = _seconds_to_frame(scene, span[1]) - _seconds_to_frame(scene, span[0])
+
+                if 0 < turn < scene.frame_end - scene.frame_start:
+                    cycle = turn
+                    last = scene.frame_end
+    else:
+        first, last, rate = scene.frame_start, scene.frame_end, 0.0
+
+        if any(k.startswith(schema.SEQUENCED_EMITTER) for k in system_node.keys()):
+            report.notes.append(
+                f"{system_node.name}: its emitter controller belongs to an animation, "
+                "so the emission window is in that clip rather than on the node -- "
+                "emitting over the whole timeline instead"
+            )
+
+    # A rate per second becomes a count per frame -- and most of these are
+    # slower than the frame rate, so rounding to a whole number per frame is
+    # wrong in the expensive direction. The campfire's embers are 7.5 a second
+    # and were being born 24 times a second, three times too many, which is what
+    # turned a handful of sprites into an opaque mass.
+    #
+    # Below the frame rate, one particle every few frames instead.
+    if rate <= 0:
+        per_frame, period = 1, 1
+    elif rate >= fps:
+        per_frame, period = max(1, int(round(rate / fps))), 1
+    else:
+        per_frame, period = 1, max(1, int(round(fps / rate)))
+
+    return {
+        "step": 1.0 / fps,
+        "per_frame": per_frame,
+
+        # One spawn every this many frames, for an emitter slower than the
+        # frame rate.
+        "period": period,
+        "start_frame": first,
+        "end_frame": last,
+
+        # How long one turn of a looping emitter is, in frames; 0 for one that
+        # runs its window once and stops.
+        "cycle": cycle,
+        "on_frames": (last - first) if not cycle else (
+            _seconds_to_frame(scene, emission[1]) - first
+            if emission and emission[1] and emission[1] > emission[0] else cycle),
+        "life": max(life, 1e-3),
+        "life_variation": max(spread, 0.0),
+        "speed": speed,
+        "speed_variation": max(wobble, 0.0),
+        "gravity": _gravity_vector(system_node),
+        "half_extent": _half_extent(emitter),
+        "centre": (0.0, 0.0, 0.0),
+
+        # Who the quads turn to face. None leaves them fixed, which is what a
+        # scene with no camera has to settle for.
+        "camera": scene.camera,
+        "size": max(_float(emitter, schema.INITIAL_RADIUS, 1.0), 1e-4),
+        "scale_over_life": _scale_curve(system_node),
+    }
+
+
+def _scale_curve(system_node):
+    """How a particle's size changes over its life, as (start, end).
+
+    ``BSPSysScaleModifier`` stores a curve -- the campfire's flames run 28 points
+    from 1.0 down to 0.5 -- and the engine walks it as the particle ages. Two
+    ends of a straight line are a fair reading of curves this shape and cost two
+    nodes rather than twenty-eight; the whole table is still on the node for
+    anything that wants it.
+    """
+    for modifier in modifiers_of(system_node):
+        if _get(modifier, schema.MODIFIER, "") != schema.SCALE:
+            continue
+
+        try:
+            count = int(float(_get(modifier, "num_scales", 0) or 0))
+        except (TypeError, ValueError):
+            continue
+
+        if count < 2:
+            continue
+
+        first = _float(modifier, "scales_0", 1.0)
+        last = _float(modifier, f"scales_{count - 1}", 1.0)
+
+        return (max(first, 0.0), max(last, 0.0))
+
+    return (1.0, 1.0)
+
+
+def _half_extent(emitter):
+    """Half the emitter volume, as a box.
+
+    A box has all three, a cylinder a radius and a height, a sphere only its
+    radius -- and the simulation spawns in a box for all three. At the size
+    these are used the difference is a few centimetres; the shape itself is
+    still carried on the modifier's node for anything that wants it.
+    """
+    kind = _get(emitter, schema.MODIFIER, "")
+
+    if kind == "NiPSysBoxEmitter":
+        return (
+            _float(emitter, schema.WIDTH, 0.0) / 2.0,
+            _float(emitter, schema.DEPTH, 0.0) / 2.0,
+            _float(emitter, schema.HEIGHT, 0.0) / 2.0,
+        )
+
+    radius = _float(emitter, schema.RADIUS, 0.0)
+
+    if kind == "NiPSysCylinderEmitter":
+        return (radius, radius, _float(emitter, schema.HEIGHT, 0.0) / 2.0)
+
+    return (radius, radius, radius)
+
+
+def _gravity_vector(system_node):
+    """The gravity modifiers, summed into one acceleration."""
+    total = [0.0, 0.0, 0.0]
+
+    for modifier in modifiers_of(system_node):
+        if _get(modifier, schema.MODIFIER, "") != schema.GRAVITY:
+            continue
+
+        strength = _float(modifier, schema.STRENGTH, 0.0)
+        axis = _vector(modifier, schema.GRAVITY_AXIS)
+
+        for i in range(3):
+            total[i] += axis[i] * strength
+
+    return tuple(total)
+
+
+def _sprite(scene, system_node, settings):
+    """The quad each particle is.
+
+    Made here rather than by the material add-on, which only dresses it: the
+    simulation needs something to instance before anything has been shaded.
+    """
+    name = f"{system_node.name}_sprite"
+    existing = bpy.data.objects.get(name)
+
+    if existing is not None:
+        return existing
+
+    half = settings["size"]
+
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(
+        [(-half, 0.0, -half), (half, 0.0, -half), (half, 0.0, half), (-half, 0.0, half)],
+        [],
+        [(0, 1, 2, 3)],
+    )
+    mesh.update()
+
+    uv = mesh.uv_layers.new(name="UVMap")
+
+    for i, pair in enumerate(((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))):
+        uv.data[i].uv = pair
+
+    sprite = bpy.data.objects.new(name, mesh)
+    scene.collection.objects.link(sprite)
+
+    sprite[schema.GENERATED] = 1
+    sprite[schema.DCC_GENERATED] = 1
+    sprite[schema.SOURCE] = system_node.name
+
+    # Only the instances should be seen.
+    sprite.hide_render = True
+    sprite.hide_set(True)
+
+    return sprite
 
 
 def build(scene):
@@ -747,23 +1085,64 @@ def build(scene):
     return report
 
 
+def bake(scene):
+    """Run the simulations through the timeline and keep the result.
+
+    A simulation zone only steps when the frame advances by one, so a file that
+    has never been played holds whatever state it was left in -- scrub to the
+    middle of an effect and almost nothing is there. Baking walks the frames
+    once and caches what comes out, so the timeline can then be scrubbed like
+    any other animation.
+
+    Quiet about failing: baking wants a context the add-on may not have when it
+    is driven from a script, and an effect that has to be played rather than
+    scrubbed is still an effect.
+    """
+    hosts = [o for o in scene.objects if o.get(schema.GENERATED) and o.modifiers]
+
+    if not hosts:
+        return 0
+
+    baked = 0
+
+    for host in hosts:
+        if not any(m.type == "NODES" for m in host.modifiers):
+            continue
+
+        try:
+            with bpy.context.temp_override(
+                    scene=scene, object=host, selected_objects=[host],
+                    active_object=host):
+                bpy.ops.object.simulation_nodes_cache_bake()
+
+            baked += 1
+        except (RuntimeError, TypeError):
+            continue
+
+    return baked
+
+
 def clear(scene):
-    """Undo a build: the systems it added and the volumes it made for them."""
+    """Undo a build: everything it added, and the node groups behind it.
+
+    The objects go first and the groups after, because a group with a modifier
+    still pointing at it has a user and will not be removed.
+    """
     removed = 0
-
-    for obj in list(scene.objects):
-        for modifier in list(obj.modifiers):
-            if modifier.type != "PARTICLE_SYSTEM":
-                continue
-
-            settings = getattr(modifier.particle_system, "settings", None)
-
-            if settings is not None and schema.GENERATED in settings:
-                obj.modifiers.remove(modifier)
-                removed += 1
 
     for obj in list(scene.objects):
         if schema.GENERATED in obj:
             bpy.data.objects.remove(obj, do_unlink=True)
+            removed += 1
+
+    for group in list(bpy.data.node_groups):
+        if group.users == 0 and group.name.endswith("_simulation"):
+            bpy.data.node_groups.remove(group)
+
+    # The invisible material the emitter volumes wore, once nothing wears it.
+    material = bpy.data.materials.get(INVISIBLE_MATERIAL)
+
+    if material is not None and material.users == 0:
+        bpy.data.materials.remove(material)
 
     return removed

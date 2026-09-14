@@ -102,9 +102,24 @@ EMITTERS = (
 AGE_DEATH = "NiPSysAgeDeathModifier"
 GRAVITY = "NiPSysGravityModifier"
 DRAG = "NiPSysDragModifier"
-ROTATION = "NiPSysRotationModifier"
-SPAWN = "NiPSysSpawnModifier"
 SCALE = "BSPSysScaleModifier"
+
+#: "Particle modifier that spawns additional copies of a particle."
+#:
+#: Named but not built, and the files say why: `Num Spawn Generations` is 0 on
+#: every system of every sample here -- the campfire's three, the spriggan's
+#: four, the waterwheel's two -- and a spawner with no generations spawns
+#: nothing. Building it would be building something none of these exercises,
+#: with no way to see whether it looked right.
+#:
+#: `NiPSysDragModifier` is the same story from the other end: it would map
+#: cleanly onto a damping term, and nothing to hand carries one.
+#:
+#: `NiPSysAgeDeathModifier` and `NiPSysPositionModifier` need no code at all --
+#: a particle dying at its life span and moving by its velocity is what the
+#: simulation does anyway -- and `NiPSysBoundUpdateModifier` is bookkeeping for
+#: an engine that culls.
+SPAWN = "NiPSysSpawnModifier"
 
 #: "Particle modifier that adds rotations to particles."
 ROTATION = "NiPSysRotationModifier"

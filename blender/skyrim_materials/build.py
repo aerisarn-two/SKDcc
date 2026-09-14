@@ -338,7 +338,7 @@ def build_effect_material(material, report):
     sheet = _subtexture_sheet(material)
 
     mapping = (
-        _atlas_mapping(tree, material, sheet, column=-10, row=0)
+        _atlas_mapping(tree, material, sheet, report, column=-10, row=0)
         if sheet is not None
         else _uv_mapping(tree, offset, scale)
     )
@@ -1064,6 +1064,28 @@ def _colour_modifier(material):
     return None
 
 
+def _float_of(holder, field, fallback=0.0):
+    """One numeric property off an object, however the exporter wrote it."""
+    try:
+        return float(holder.get(field, fallback))
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _subtex_modifier(material):
+    """The BSPSysSubTexModifier under this material's system, or None."""
+    node = _system_node_for(material)
+
+    if node is None:
+        return None
+
+    for child in node.children:
+        if child.get("particle_modifier") == schema.SUBTEX_MODIFIER:
+            return child
+
+    return None
+
+
 def _life_ramp(tree, modifier, column, row):
     """The colour and alpha a particle wears over its life, as nodes.
 
@@ -1205,7 +1227,7 @@ def _subtexture_sheet(material):
     return count, width, height
 
 
-def _atlas_mapping(tree, material, sheet, column, row):
+def _atlas_mapping(tree, material, sheet, report, column, row):
     """UVs that walk the sheet as a particle ages.
 
     The engine steps a particle through the frames over its life with a
@@ -1217,53 +1239,126 @@ def _atlas_mapping(tree, material, sheet, column, row):
     count, width, height = sheet
     columns = max(int(round(1.0 / width)), 1)
 
-    age = tree.add("ShaderNodeAttribute", column=column, row=row)
-    age.attribute_type = "INSTANCER"
-    age.attribute_name = schema.PARTICLE_AGE
+    seed = tree.add("ShaderNodeAttribute", column=column, row=row + 3)
+    seed.attribute_type = "INSTANCER"
+    seed.attribute_name = schema.PARTICLE_SEED
 
-    # frame = min(floor(age * count), count - 1)
-    scaled = tree.add("ShaderNodeMath", column=column + 1, row=row, operation="MULTIPLY")
-    scaled.inputs[1].default_value = float(count)
-    tree.link(age.outputs["Fac"], scaled, 0)
+    walker = _subtex_modifier(material)
 
-    whole = tree.add("ShaderNodeMath", column=column + 2, row=row, operation="FLOOR")
-    tree.link(scaled.outputs[0], whole, 0)
+    if walker is None:
+        # No modifier, no flipping -- but still one cell each, because the data
+        # carries one per particle: `NiPSysData.Has Texture Indices` is set on
+        # all three of the campfire's systems, so the index is a property of the
+        # particle rather than of the frame. nif.xml describes
+        # BSPSysSubTexModifier as the thing that "handles particle texture
+        # animation on a single texture atlas", which is what moves that index;
+        # without one it stays where it was assigned.
+        #
+        # So the campfire's smoke is sixteen puffs that differ, not one puff
+        # that morphs through sixteen shapes as it rises, which is what walking
+        # the sheet by age made of it.
+        #
+        # frame = floor(seed * count), fixed for the particle's life.
+        picked = tree.add("ShaderNodeMath", column=column + 1, row=row, operation="MULTIPLY")
+        picked.inputs[1].default_value = float(count)
+        tree.link(seed.outputs["Fac"], picked, 0)
 
-    frame = tree.add("ShaderNodeMath", column=column + 3, row=row, operation="MINIMUM")
-    frame.inputs[1].default_value = float(count - 1)
-    tree.link(whole.outputs[0], frame, 0)
+        whole = tree.add("ShaderNodeMath", column=column + 2, row=row, operation="FLOOR")
+        tree.link(picked.outputs[0], whole, 0)
 
-    across = tree.add("ShaderNodeMath", column=column + 4, row=row, operation="MODULO")
+        frame = tree.add("ShaderNodeMath", column=column + 3, row=row, operation="MINIMUM")
+        frame.inputs[1].default_value = float(count - 1)
+        tree.link(whole.outputs[0], frame, 0)
+
+        report.notes.append(
+            f"{material.name}: {count} atlas cells and no BSPSysSubTexModifier, so each "
+            "particle wears one of them for its life rather than walking the sheet"
+        )
+    else:
+        # frame = start + seed * startFudge + age * frameCount, wrapped back to
+        # loopStart once it passes end.
+        #
+        # The campfire's fire column: start 0, fudge 64, count 128 over 64
+        # cells. So each flame begins on its own frame and plays the sheet twice
+        # over its life -- walking it once from zero, as this did, ran the
+        # animation at half speed with every flame in step with every other.
+        start = _float_of(walker, schema.SUBTEX_START, 0.0)
+        fudge = _float_of(walker, schema.SUBTEX_START_FUDGE, 0.0)
+        frames = _float_of(walker, schema.SUBTEX_FRAME_COUNT, float(count))
+        loop = _float_of(walker, schema.SUBTEX_LOOP_START, 0.0)
+        end = _float_of(walker, schema.SUBTEX_END, float(count - 1))
+
+        age = tree.add("ShaderNodeAttribute", column=column, row=row)
+        age.attribute_type = "INSTANCER"
+        age.attribute_name = schema.PARTICLE_AGE
+
+        travelled = tree.add("ShaderNodeMath", column=column + 1, row=row, operation="MULTIPLY")
+        travelled.inputs[1].default_value = max(frames, 1.0)
+        tree.link(age.outputs["Fac"], travelled, 0)
+
+        offset = tree.add("ShaderNodeMath", column=column + 1, row=row + 3, operation="MULTIPLY")
+        offset.inputs[1].default_value = fudge
+        tree.link(seed.outputs["Fac"], offset, 0)
+
+        begun = tree.add("ShaderNodeMath", column=column + 2, row=row + 3, operation="ADD")
+        begun.inputs[1].default_value = start
+        tree.link(offset.outputs[0], begun, 0)
+
+        total = tree.add("ShaderNodeMath", column=column + 2, row=row, operation="ADD")
+        tree.link(travelled.outputs[0], total, 0)
+        tree.link(begun.outputs[0], total, 1)
+
+        # Wrapped into [loop, end]: past the last frame it goes back to the loop
+        # frame rather than to the first one, which is what the field is for.
+        span = max(end - loop + 1.0, 1.0)
+
+        over = tree.add("ShaderNodeMath", column=column + 3, row=row, operation="SUBTRACT")
+        over.inputs[1].default_value = loop
+        tree.link(total.outputs[0], over, 0)
+
+        wrapped = tree.add("ShaderNodeMath", column=column + 4, row=row, operation="WRAP")
+        wrapped.inputs[1].default_value = span
+        wrapped.inputs[2].default_value = 0.0
+        tree.link(over.outputs[0], wrapped, 0)
+
+        back = tree.add("ShaderNodeMath", column=column + 5, row=row, operation="ADD")
+        back.inputs[1].default_value = loop
+        tree.link(wrapped.outputs[0], back, 0)
+
+        frame = tree.add("ShaderNodeMath", column=column + 6, row=row, operation="FLOOR")
+        tree.link(back.outputs[0], frame, 0)
+
+    across = tree.add("ShaderNodeMath", column=column + 7, row=row, operation="MODULO")
     across.inputs[1].default_value = float(columns)
     tree.link(frame.outputs[0], across, 0)
 
-    down = tree.add("ShaderNodeMath", column=column + 4, row=row + 1, operation="DIVIDE")
+    down = tree.add("ShaderNodeMath", column=column + 7, row=row + 1, operation="DIVIDE")
     down.inputs[1].default_value = float(columns)
     tree.link(frame.outputs[0], down, 0)
 
-    down_whole = tree.add("ShaderNodeMath", column=column + 5, row=row + 1, operation="FLOOR")
+    down_whole = tree.add("ShaderNodeMath", column=column + 8, row=row + 1, operation="FLOOR")
     tree.link(down.outputs[0], down_whole, 0)
 
-    left = tree.add("ShaderNodeMath", column=column + 5, row=row, operation="MULTIPLY")
+    left = tree.add("ShaderNodeMath", column=column + 8, row=row, operation="MULTIPLY")
     left.inputs[1].default_value = width
     tree.link(across.outputs[0], left, 0)
 
     # Blender's V runs the other way from the sheet's, so a row counts down from
     # the top rather than up from the bottom.
-    stride = tree.add("ShaderNodeMath", column=column + 6, row=row + 1, operation="MULTIPLY")
+    stride = tree.add("ShaderNodeMath", column=column + 9, row=row + 1, operation="MULTIPLY")
     stride.inputs[1].default_value = height
     tree.link(down_whole.outputs[0], stride, 0)
 
-    top = tree.add("ShaderNodeMath", column=column + 7, row=row + 1, operation="SUBTRACT")
+    top = tree.add("ShaderNodeMath", column=column + 10, row=row + 1, operation="SUBTRACT")
     top.inputs[0].default_value = 1.0 - height
     tree.link(stride.outputs[0], top, 1)
 
-    place = tree.add("ShaderNodeCombineXYZ", column=column + 8, row=row)
+    place = tree.add("ShaderNodeCombineXYZ", column=column + 11, row=row)
     tree.link(left.outputs[0], place, "X")
     tree.link(top.outputs[0], place, "Y")
 
     coords = tree.add("ShaderNodeTexCoord", column=column, row=row + 2)
-    mapping = tree.add("ShaderNodeMapping", column=column + 9, row=row)
+    mapping = tree.add("ShaderNodeMapping", column=column + 12, row=row)
     mapping.inputs["Scale"].default_value = (width, height, 1.0)
     tree.link(coords.outputs["UV"], mapping, "Vector")
     tree.link(place.outputs["Vector"], mapping, "Location")

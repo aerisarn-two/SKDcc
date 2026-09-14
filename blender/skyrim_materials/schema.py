@@ -220,3 +220,17 @@ DCC_GENERATED = "skdcc_generated"
 #: ``skyrim_particles.simulation.PARTICLE_AGE``; read with an Attribute node of
 #: type INSTANCER, which Eevee implements where Particle Info is not.
 PARTICLE_AGE = "ParticleAge"
+
+#: And one number per particle that does not change as it ages. Mirror of
+#: ``skyrim_particles.simulation.PARTICLE_SEED``.
+PARTICLE_SEED = "ParticleSeed"
+
+#: BSPSysSubTexModifier: "Similar to a Flip Controller, this handles particle
+#: texture animation on a single texture atlas". A system with subtexture
+#: offsets and no such modifier does not flip at all.
+SUBTEX_MODIFIER = "BSPSysSubTexModifier"
+SUBTEX_START = "start_frame"
+SUBTEX_START_FUDGE = "start_frame_fudge"
+SUBTEX_END = "end_frame"
+SUBTEX_LOOP_START = "loop_start_frame"
+SUBTEX_FRAME_COUNT = "frame_count"

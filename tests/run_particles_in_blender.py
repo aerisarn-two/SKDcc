@@ -193,6 +193,31 @@ def main():
 
     check("particles accumulate", later > early, True)
 
+    # NiPSysRotationModifier: each particle turns at its own rate, so no two of
+    # them face the same way. Without it a rising puff is a decal.
+    spinning = [n for n in systems
+                if n.name in report.systems
+                and any(abs(v) > 1e-6 for v in build._rotation(n)[:2])]
+
+    if spinning:
+        graph = bpy.context.evaluated_depsgraph_get()
+        graph.update()
+
+        turned = {o.parent.name if o.parent else "?":
+                  set() for o in graph.object_instances if o.is_instance}
+
+        for inst in graph.object_instances:
+            if inst.is_instance:
+                name = inst.parent.name if inst.parent else "?"
+                turned[name].add(tuple(round(a, 4) for a in inst.matrix_world.to_euler()))
+
+        for node in spinning:
+            host = f"{node.name}_particles"
+
+            if len(turned.get(host, ())) > 0:
+                check(f"{node.name} particles do not all face the same way",
+                      len(turned[host]) > 1, True)
+
     # Still burning at the end. A looping emitter has to reach the last frame:
     # the count is taken there rather than trusting the settings.
     looping = [n for n in systems if build.cycle_of(n) in ("LOOP", "REVERSE")

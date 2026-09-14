@@ -958,6 +958,7 @@ def _simulation_settings(system_node, emitter, scene, report, units):
         "camera": scene.camera,
         "size": max(_float(emitter, schema.INITIAL_RADIUS, 1.0), 1e-4),
         "aspect": _aspect(system_node),
+        "spin": _rotation(system_node),
         "scale_over_life": _scale_curve(system_node),
     }
 
@@ -989,6 +990,31 @@ def _scale_curve(system_node):
         return (max(first, 0.0), max(last, 0.0))
 
     return (1.0, 1.0)
+
+
+def _rotation(system_node):
+    """How each particle spins, from ``NiPSysRotationModifier``.
+
+    Returns ``(speed, variation, angle, random_sign)`` in radians and radians a
+    second. The campfire's flames and smoke turn at 15 degrees a second give or
+    take 15, with the direction decided per particle -- it is what stops a
+    rising puff from looking like a decal, and nothing was reading it.
+    """
+    for modifier in modifiers_of(system_node):
+        if _get(modifier, schema.MODIFIER, "") != schema.ROTATION:
+            continue
+
+        if not int(_float(modifier, schema.ACTIVE, 1.0)):
+            continue
+
+        return (
+            _float(modifier, schema.ROTATION_SPEED, 0.0),
+            abs(_float(modifier, schema.ROTATION_SPEED_VARIATION, 0.0)),
+            _float(modifier, schema.ROTATION_ANGLE, 0.0),
+            bool(int(_float(modifier, schema.RANDOM_ROTATION_SIGN, 0.0))),
+        )
+
+    return (0.0, 0.0, 0.0, False)
 
 
 def _half_extent(emitter):

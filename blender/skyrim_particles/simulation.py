@@ -30,6 +30,7 @@ AGE = "Age"
 LIFETIME = "Lifetime"
 VELOCITY = "Velocity"
 SEED = "Seed"
+SPIN = "Spin"
 
 #: On the instance domain, for the shader. Named for what a material asks for
 #: rather than for what the simulation calls it.
@@ -200,8 +201,23 @@ def build_group(name, settings, sprite):
     g.link(sim_out.outputs["Geometry"], instances, "Points")
     g.link(info.outputs["Geometry"], instances, "Instance")
 
-    if settings.get("camera") is not None:
-        g.link(_billboard(g, settings["camera"]), instances, "Rotation")
+    facing = _billboard(g, settings["camera"]) if settings.get("camera") is not None else None
+    turning = _spin(g, settings, age)
+
+    if turning is not None and facing is not None:
+        # In the quad's own frame, not the world's: the billboard has already
+        # aimed it at the camera, and spinning about a world axis would tip it
+        # back out of the view. Local Y is the quad's normal -- it is built in
+        # the XZ plane -- so turning about that is a turn in its own plane.
+        compose = g.add("FunctionNodeRotateRotation", 1600, -150)
+        compose.rotation_space = "LOCAL"
+        g.link(facing, compose, 0)
+        g.link(turning, compose, 1)
+        g.link(compose.outputs[0], instances, "Rotation")
+    elif turning is not None:
+        g.link(turning, instances, "Rotation")
+    elif facing is not None:
+        g.link(facing, instances, "Rotation")
 
     fraction = g.add("ShaderNodeMath", 1700, -300, operation="DIVIDE", use_clamp=True)
     g.link(_Graph.read(age), fraction, 0)
@@ -381,7 +397,87 @@ def _spawn(g, settings):
     _vary(g, die, index, frame)
     g.link(_out(die), _value_socket(marked))
 
+    # NiPSysRotationModifier: how fast this one turns, and which way. Drawn here
+    # rather than worked out in the shader because it has to be the same number
+    # for the particle's whole life, and a magnitude with a sign is two draws
+    # that must not be the same draw -- taking the sign off the speed would make
+    # slow particles and anticlockwise particles the same particles.
+    speed, spread, _angle, flip = settings["spin"]
+
+    if abs(speed) > 1e-6 or spread > 1e-6:
+        spun = g.store(1600, 500, SPIN, "FLOAT")
+        g.link(marked.outputs["Geometry"], spun, "Geometry")
+
+        rate = g.add("FunctionNodeRandomValue", 1400, 300, data_type="FLOAT")
+        rate.inputs[2].default_value = speed - spread
+        rate.inputs[3].default_value = speed + spread
+        _vary(g, rate, index, frame)
+
+        if flip:
+            coin = g.add("FunctionNodeRandomValue", 1400, 100, data_type="INT")
+            coin.inputs[4].default_value = 0
+            coin.inputs[5].default_value = 1
+            _vary(g, coin, index, frame)
+
+            # The seed is the frame, so a second draw on the same frame repeats
+            # the first. Offset it, or every particle born together would spin
+            # the same way.
+            if "Seed" in coin.inputs:
+                offset = g.add("ShaderNodeMath", 1250, 100, operation="ADD")
+                offset.inputs[1].default_value = 7919.0
+                g.link(frame.outputs["Frame"], offset, 0)
+                g.link(offset.outputs[0], coin, "Seed")
+
+            sign = g.add("ShaderNodeMath", 1500, 100, operation="MULTIPLY_ADD")
+            sign.inputs[1].default_value = 2.0
+            sign.inputs[2].default_value = -1.0
+            g.link(_out(coin), sign, 0)
+
+            signed = g.add("ShaderNodeMath", 1550, 300, operation="MULTIPLY")
+            g.link(_out(rate), signed, 0)
+            g.link(sign.outputs[0], signed, 1)
+            g.link(signed.outputs[0], _value_socket(spun))
+        else:
+            g.link(_out(rate), _value_socket(spun))
+
+        return spun
+
     return marked
+
+
+def _spin(g, settings, age):
+    """A rotation in the quad's own plane, from NiPSysRotationModifier.
+
+    ``angle = initial + speed * age``, with the speed drawn once per particle at
+    birth. The campfire's smoke turns at 15 degrees a second give or take 15,
+    which is the difference between a rising puff and a rising decal.
+    """
+    speed, spread, initial, _flip = settings["spin"]
+
+    if abs(speed) <= 1e-6 and spread <= 1e-6 and abs(initial) <= 1e-6:
+        return None
+
+    if abs(speed) > 1e-6 or spread > 1e-6:
+        turned = g.add("ShaderNodeMath", 1400, -150, operation="MULTIPLY")
+        g.link(_Graph.read(g.named(1250, -150, SPIN)), turned, 0)
+        g.link(_Graph.read(age), turned, 1)
+
+        total = g.add("ShaderNodeMath", 1500, -150, operation="ADD")
+        total.inputs[1].default_value = initial
+        g.link(turned.outputs[0], total, 0)
+        angle = total.outputs[0]
+    else:
+        angle = None
+
+    axis = g.add("FunctionNodeAxisAngleToRotation", 1550, -300)
+    axis.inputs["Axis"].default_value = (0.0, 1.0, 0.0)
+
+    if angle is not None:
+        g.link(angle, axis, "Angle")
+    else:
+        axis.inputs["Angle"].default_value = initial
+
+    return axis.outputs[0]
 
 
 def _billboard(g, camera):

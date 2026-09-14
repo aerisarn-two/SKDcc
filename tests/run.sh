@@ -6,7 +6,8 @@
 # Without an FBX, the host-free suites run: the Maya and Max scripts against a
 # recorded fixture, and the check that the three schema copies have not drifted.
 # With one, the constraints add-on runs inside Blender as well; with a second,
-# so does the particle add-on, which needs an effect rather than a creature.
+# so do the particle and material add-ons, which need an effect rather than a
+# creature.
 #
 # --factory-startup is deliberately NOT passed to Blender. It leaves
 # io_scene_fbx's operator properties unregistered and the exporter then dies with
@@ -50,6 +51,16 @@ if [ "$#" -ge 2 ]; then
 else
     echo
     echo "== blender particles: skipped, pass an effect FBX as the second argument =="
+fi
+
+# The materials add-on wants whatever has shaders on it, which is any converted
+# mesh -- the effect if there is one, since that is where the effect shaders are.
+if [ "$#" -ge 1 ]; then
+    echo
+    echo "== blender materials (live) =="
+    "$blender" --background --python "$here/run_materials_in_blender.py" -- "${2:-$1}" 2>&1 \
+        | grep -E '^(PASS|FAIL|     )|checks failed|FAILED:'
+    failures=$((failures + ${PIPESTATUS[0]}))
 fi
 
 # The import repair works on anything converted, so it runs against whichever

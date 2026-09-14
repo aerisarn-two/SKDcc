@@ -829,6 +829,18 @@ def build_system(system_node, scene, scene_objects, report):
     settings["centre"] = tuple(
         (system_node.matrix_world.inverted() @ carrier.matrix_world).translation)
 
+    # A NiPSysMeshEmitter births from the surface of a mesh the file names --
+    # the lumbermill's waterwheel has a strip of geometry where the wheel meets
+    # the water -- so the mesh itself is the spawn volume and there is nothing
+    # to approximate. Emission Type 3 is EMIT_FROM_FACE_SURFACE, "randomly from
+    # anywhere on the faces", which is a Distribute Points on Faces.
+    if kind == "NiPSysMeshEmitter":
+        settings["surface"] = carrier
+        settings["surface_density"] = _density_for(carrier, settings, units)
+        settings["along_normals"] = (
+            int(_float(emitter, schema.INITIAL_VELOCITY_TYPE, 0.0)) == schema.USE_NORMALS
+        )
+
     if settings["camera"] is None:
         report.notes.append(
             f"{system_node.name}: no camera in the scene, so its quads face one way "
@@ -990,6 +1002,52 @@ def _scale_curve(system_node):
         return (max(first, 0.0), max(last, 0.0))
 
     return (1.0, 1.0)
+
+
+def _world_of(obj):
+    """The world matrix the parent chain composes, not the cached one.
+
+    ``hide_viewport`` takes an object out of the depsgraph, so nothing ever
+    recomputes its cached ``matrix_world`` and it keeps whatever the importer
+    left there. The lumbermill's emitter mesh is hidden and its cache says 508
+    metres across against a real 6, which made the spawn area ten thousand times
+    too large and the density ten thousand times too small: no particles at all.
+
+    The scale add-on refreshes those caches, but this should not need it to have
+    been run first.
+    """
+    if obj.parent is None:
+        return obj.matrix_basis.copy()
+
+    return _world_of(obj.parent) @ obj.matrix_parent_inverse @ obj.matrix_basis
+
+
+def _density_for(carrier, settings, units):
+    """Points per square unit that gives the wanted count on this mesh.
+
+    The simulation runs in the system node's frame, where lengths are the
+    file's own units, so the area has to be measured there too -- the mesh is a
+    scene object at scene scale, and its own area is in metres.
+    """
+    mesh = getattr(carrier, "data", None)
+
+    if mesh is None or not getattr(mesh, "polygons", None):
+        return 0.0
+
+    matrix = _world_of(carrier)
+    area = 0.0
+
+    for polygon in mesh.polygons:
+        corners = [matrix @ mesh.vertices[i].co for i in polygon.vertices]
+
+        for i in range(1, len(corners) - 1):
+            area += (corners[i] - corners[0]).cross(corners[i + 1] - corners[0]).length / 2.0
+
+    if area <= 0.0:
+        return 0.0
+
+    # Metres squared to the frame's own units squared.
+    return settings["per_frame"] / (area / max(units * units, 1e-12))
 
 
 def _rotation(system_node):

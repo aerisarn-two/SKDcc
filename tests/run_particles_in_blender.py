@@ -155,6 +155,33 @@ def main():
         if schema.GRAVITY not in kinds:
             check(f"{node.name} no gravity", settings["gravity"], (0.0, 0.0, 0.0))
 
+        # A NiPSysMeshEmitter births from the surface of a mesh the file names,
+        # not from a volume. The lumbermill's waterwheel emits from a strip of
+        # geometry where the wheel meets the water; with no mesh handling every
+        # particle spawned at the node origin and they stacked up in a single
+        # vertical line, which read as a thin wisp of steam.
+        if emitter.get(schema.MODIFIER, "") == "NiPSysMeshEmitter":
+            check(f"{node.name} emits from its mesh",
+                  any(n.type == "DISTRIBUTE_POINTS_ON_FACES" for n in group.nodes), True)
+
+            # And the area it spreads over is measured off the parent chain,
+            # not off a cached world matrix: the emitter mesh is hidden, so its
+            # cache holds whatever the importer left and the density came out
+            # ten thousand times too small -- no particles at all.
+            #
+            # Read off the built graph rather than off a settings dict, since
+            # the density is worked out after the settings are made.
+            spreading = [
+                n for n in group.nodes if n.type == "DISTRIBUTE_POINTS_ON_FACES"
+            ]
+
+            for node_ in spreading:
+                feed = node_.inputs["Density"]
+                value = (feed.links[0].from_node.inputs[1].default_value
+                         if feed.links else feed.default_value)
+
+                check(f"{node.name} has somewhere to spread over", value > 0.0, True)
+
         # The quad the particles are drawn as, sized by the emitter's radius.
         sprite = bpy.data.objects.get(f"{node.name}_sprite")
         check(f"{node.name} has a sprite", sprite is not None, True)
@@ -192,6 +219,33 @@ def main():
           f"frame {scene.frame_start + 40} -> {later}")
 
     check("particles accumulate", later > early, True)
+
+    # A mesh emitter spreads them over a surface, so they must not be collinear.
+    mesh_emitters = [
+        n for n in systems
+        if n.name in report.systems
+        and (build.emitter_of(n) or {}).get(schema.MODIFIER, "") == "NiPSysMeshEmitter"
+    ]
+
+    if mesh_emitters:
+        graph = bpy.context.evaluated_depsgraph_get()
+        graph.update()
+
+        spread = {}
+
+        for inst in graph.object_instances:
+            if inst.is_instance:
+                name = inst.parent.name if inst.parent else "?"
+                spread.setdefault(name, []).append(
+                    tuple(round(v, 3) for v in inst.matrix_world.translation))
+
+        for node in mesh_emitters:
+            places = spread.get(f"{node.name}_particles", [])
+
+            if places:
+                for axis, label in ((0, "x"), (1, "y")):
+                    check(f"{node.name} spreads across {label}",
+                          len({p[axis] for p in places}) > 1, True)
 
     # NiPSysRotationModifier: each particle turns at its own rate, so no two of
     # them face the same way. Without it a rising puff is a decal.

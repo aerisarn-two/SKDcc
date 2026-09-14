@@ -331,8 +331,30 @@ def _spawn(g, settings):
     count.inputs[1].default_value = float(settings["per_frame"])
     g.link(running.outputs[0], count, 0)
 
-    points = g.add("GeometryNodePoints", 800, 500)
-    g.link(count.outputs[0], points, "Count")
+    surface = settings.get("surface")
+    density = float(settings.get("surface_density", 0.0) or 0.0)
+
+    if surface is not None and density > 0.0:
+        # A NiPSysMeshEmitter births from the surface of a mesh the file names.
+        # Relative space, so the mesh arrives where it actually sits in the
+        # frame the simulation runs in rather than in its own local axes.
+        emitting = g.add("GeometryNodeObjectInfo", 620, 620)
+        emitting.transform_space = "RELATIVE"
+        emitting.inputs["Object"].default_value = surface
+
+        points = g.add("GeometryNodeDistributePointsOnFaces", 800, 500)
+        g.link(emitting.outputs["Geometry"], points, "Mesh")
+        g.link(frame.outputs["Frame"], points, "Seed")
+
+        # Density rather than a count, which is what the node takes; the count
+        # comes back out of it by way of the area the file's mesh covers.
+        spread = g.add("ShaderNodeMath", 620, 780, operation="MULTIPLY")
+        spread.inputs[1].default_value = density
+        g.link(running.outputs[0], spread, 0)
+        g.link(spread.outputs[0], points, "Density")
+    else:
+        points = g.add("GeometryNodePoints", 800, 500)
+        g.link(count.outputs[0], points, "Count")
 
     # Where in the emitter volume, which the NIF gives as a box, a cylinder or a
     # sphere. A box of the right size is a fair stand-in for all three at the
@@ -345,11 +367,12 @@ def _spawn(g, settings):
     # Around where the emitter sits in the system's frame, not around the frame
     # itself: the flame above a campfire is born at the emitter and the smoke a
     # metre higher.
-    where = g.add("FunctionNodeRandomValue", 620, 400, data_type="FLOAT_VECTOR")
-    where.inputs[0].default_value = tuple(c - h for c, h in zip(centre, half))
-    where.inputs[1].default_value = tuple(c + h for c, h in zip(centre, half))
-    _vary(g, where, index, frame)
-    g.link(_out(where), points, "Position")
+    if "Position" in points.inputs:
+        where = g.add("FunctionNodeRandomValue", 620, 400, data_type="FLOAT_VECTOR")
+        where.inputs[0].default_value = tuple(c - h for c, h in zip(centre, half))
+        where.inputs[1].default_value = tuple(c + h for c, h in zip(centre, half))
+        _vary(g, where, index, frame)
+        g.link(_out(where), points, "Position")
 
     lived = g.store(1000, 500, LIFETIME, "FLOAT")
     g.link(points.outputs["Points"], lived, "Geometry")
@@ -373,14 +396,30 @@ def _spawn(g, settings):
     speed = settings["speed"]
     wobble = settings["speed_variation"]
 
-    if wobble > 0.0:
-        fast = g.add("FunctionNodeRandomValue", 1000, 300, data_type="FLOAT")
-        fast.inputs[2].default_value = max(speed - wobble, 0.0)
-        fast.inputs[3].default_value = speed + wobble
-        _vary(g, fast, index, frame)
+    # VELOCITY_USE_NORMALS: a mesh emitter throws each particle along the face
+    # it was born on, which is what makes a waterwheel throw water outwards
+    # instead of straight up one axis. The distribute node hands the normal out
+    # beside the points it made.
+    along = (settings.get("along_normals") and "Normal" in points.outputs)
+    direction = points.outputs["Normal"] if along else None
+
+    if wobble > 0.0 or direction is not None:
         scaled = g.add("ShaderNodeVectorMath", 1150, 300, operation="SCALE")
-        scaled.inputs[0].default_value = schema.EMISSION_AXIS
-        g.link(_out(fast), scaled, "Scale")
+
+        if direction is not None:
+            g.link(direction, scaled, 0)
+        else:
+            scaled.inputs[0].default_value = schema.EMISSION_AXIS
+
+        if wobble > 0.0:
+            fast = g.add("FunctionNodeRandomValue", 1000, 300, data_type="FLOAT")
+            fast.inputs[2].default_value = max(speed - wobble, 0.0)
+            fast.inputs[3].default_value = speed + wobble
+            _vary(g, fast, index, frame)
+            g.link(_out(fast), scaled, "Scale")
+        else:
+            scaled.inputs["Scale"].default_value = speed
+
         g.link(scaled.outputs[0], _value_socket(thrown))
     else:
         _value_socket(thrown).default_value = tuple(a * speed for a in schema.EMISSION_AXIS)

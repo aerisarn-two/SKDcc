@@ -77,3 +77,28 @@ def fix(scene):
         bpy.context.view_layer.update()
 
     return corrected, unparented
+
+
+def hide_from_render(scene):
+    """Keep out of renders what the file says is not render geometry.
+
+    A NIF marks its collision proxies and its invisible nodes hidden, and the
+    FBX carries that as the model's visibility. Blender's importer applies it to
+    the *viewport* only -- ``hide_viewport`` -- and leaves ``hide_render`` alone,
+    so a campfire's MOPP hull is absent while you work and then covers the fire
+    the moment you render it.
+
+    It took a while to notice because the two disagree exactly where it is
+    hardest to see: every render made while testing had an untextured collision
+    hull sitting over the model, and it read as the lighting being wrong.
+
+    Returns what was hidden.
+    """
+    hidden = []
+
+    for obj in scene.objects:
+        if obj.hide_viewport and not obj.hide_render:
+            obj.hide_render = True
+            hidden.append(obj.name)
+
+    return hidden

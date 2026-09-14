@@ -33,7 +33,19 @@ def find_body(objects, name):
     prefix = name + "."
     matches = [o for o in objects
                if o.name.startswith(prefix) and o.name[len(prefix):].isdigit()]
-    return matches[0] if len(matches) == 1 else None
+
+    if len(matches) == 1:
+        return matches[0]
+
+    # By the name Havok knows it by, which is not the name the NIF knows it by.
+    # A creature exported together with its skeleton.hkx has the ragdoll names
+    # read out of Havok rather than inferred, so its constraints ask for
+    # `Ragdoll_Pelvis01` while the object in the scene is `Pelvis_rb` -- and
+    # every joint on the chicken was skipped for a body that was right there.
+    # The body itself carries the mapping.
+    named = [o for o in objects if str(o.get(schema.RAGDOLL_BONE, "")) == name]
+
+    return named[0] if len(named) == 1 else None
 
 
 def shape_of(body):

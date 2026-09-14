@@ -54,7 +54,18 @@ def main():
         return
 
     # What they were before, so the rebuild can be shown to have changed them.
-    before = {m.name: len(m.node_tree.nodes) if m.use_nodes else 0 for m in skyrim}
+    # A fingerprint rather than a node count. The swinging bridge's material
+    # rebuilds from six nodes to six -- a texture goes, the glossiness inversion
+    # arrives -- so counting them said the rebuild had done nothing.
+    def fingerprint(material):
+        if not material.use_nodes:
+            return ((), 0)
+
+        tree = material.node_tree
+
+        return (tuple(sorted(n.type for n in tree.nodes)), len(tree.links))
+
+    before = {m.name: fingerprint(m) for m in skyrim}
 
     report = build.build(scene)
     print(f"     {report}")
@@ -286,13 +297,22 @@ def main():
         output = nodes_of(material, "OUTPUT_MATERIAL")
         check(f"{material.name} output is connected", bool(output and output[0].inputs["Surface"].links), True)
 
-    check("some effect shaders were rebuilt", effects > 0, True)
+    # Only where there are any. A door, a banner and a bridge carry lighting
+    # shaders and nothing else, and this suite only ever ran against effects --
+    # so it asserted that every file has fire in it.
+    wanted = sum(1 for m in skyrim if build.is_effect_shader(m))
+
+    if wanted:
+        check("some effect shaders were rebuilt", effects > 0, True)
+    else:
+        check("some lighting shaders were rebuilt", len(report.materials) > 0, True)
+        print("     no effect shaders in this file, so there is no fire to check")
 
     # The rebuild has to have done something: an unchanged tree would pass every
     # check above if Blender's importer happened to build the same shapes.
     changed = sum(
         1 for m in skyrim
-        if m.name in report.materials and len(m.node_tree.nodes) != before[m.name]
+        if m.name in report.materials and fingerprint(m) != before[m.name]
     )
     check("the trees changed", changed > 0, True)
 

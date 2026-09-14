@@ -54,9 +54,22 @@ def main():
     # its collision off bones, and a bone-parented object is placed by a
     # composition this add-on does not do, so it is left alone and the file
     # shows no disagreement to find.
+    # The whole chain, not just the last link. A swinging bridge hangs its
+    # collision boxes off rigid bodies that are themselves parented to bones, so
+    # the box is object-parented to something the repair cannot place -- and a
+    # repair that cannot place the parent cannot place the child either.
+    def object_parented(obj):
+        while obj.parent is not None:
+            if obj.parent_type != "OBJECT":
+                return False
+
+            obj = obj.parent
+
+        return True
+
     fixable = [
         o for o in scene.objects
-        if o.type == "MESH" and o.parent is not None and o.parent_type == "OBJECT"
+        if o.type == "MESH" and o.parent is not None and object_parented(o)
     ]
 
     # It takes both: something hidden to be wrong and something visible to be

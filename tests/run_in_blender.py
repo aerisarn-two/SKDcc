@@ -90,8 +90,15 @@ def main():
 
     # --- the limits actually arrived ---------------------------------------
 
+    # Only where the file has any. A chicken's ragdoll is six Ragdoll joints and
+    # not one hinge, and this suite had only ever been run on creatures that had
+    # both -- so it asserted that every skeleton has a knee.
     hinges = [j for j in built if Joint(j).type == "LimitedHinge"]
-    check("the corpus has limited hinges", len(hinges) > 0, "%d" % len(hinges))
+
+    if hinges:
+        check("the corpus has limited hinges", len(hinges) > 0, "%d" % len(hinges))
+    else:
+        print("     no limited hinges in this skeleton, so there are none to check")
 
     exact = 0
     for obj in hinges:

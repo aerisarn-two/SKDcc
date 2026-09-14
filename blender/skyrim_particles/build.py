@@ -236,10 +236,228 @@ def _units_of(obj):
     return (abs(scale[0]) + abs(scale[1]) + abs(scale[2])) / 3.0
 
 
-def _seconds_to_frames(scene, seconds):
-    fps = scene.render.fps / max(scene.render.fps_base, 1e-6)
+def _fps(scene):
+    return scene.render.fps / max(scene.render.fps_base, 1e-6)
 
-    return max(1, int(round(seconds * fps)))
+
+def _seconds_to_frames(scene, seconds):
+    """A duration in seconds, as a number of frames.
+
+    At least one: a particle that lives no frames is not a particle.
+    """
+    return max(1, int(round(seconds * _fps(scene))))
+
+
+def _seconds_to_frame(scene, seconds):
+    """A moment in the effect's own time, as a frame on this scene's timeline.
+
+    Second zero of the effect is wherever the scene starts, which need not be
+    frame one -- so this is an offset from ``frame_start`` rather than a count,
+    and is the other half of the pair with :func:`_seconds_to_frames`.
+    """
+    return scene.frame_start + int(round(seconds * _fps(scene)))
+
+
+def _controllers(system_node):
+    """The structural controllers on a system's node, as dicts of their fields.
+
+    NIFBX carries a particle system's own controllers here rather than as scene
+    animation, because they are the effect's settings rather than a clip: there
+    is no clip, and the stack it used to invent for them is the first thing a
+    DCC tool throws away. See ``FbxNodeControllers.Write``.
+    """
+    try:
+        count = int(_get(system_node, schema.CONTROLLER_COUNT, 0) or 0)
+    except (TypeError, ValueError):
+        return []
+
+    found = []
+
+    for i in range(count):
+        prefix = f"{schema.CONTROLLER_PREFIX}{i}_"
+        fields = {}
+
+        for key in system_node.keys():
+            if key.startswith(prefix):
+                fields[key[len(prefix):]] = system_node[key]
+
+        if fields.get("type"):
+            found.append(fields)
+
+    return found
+
+
+def emission_of(system_node):
+    """When the system emits and how fast, or None when nothing says.
+
+    Returns ``(start, stop, rate)`` in seconds and particles per second. The
+    emitter-active track is preferred over the controller's own span, because
+    the span is when the controller *runs* and the track is when it *emits* --
+    they agree in every vanilla file measured, but the track is the statement.
+
+    A track with no keys means always on, which is what 1,055 of the game's
+    1,704 emitter controllers say.
+    """
+    for fields in _controllers(system_node):
+        if fields.get("type") not in (schema.EMITTER_CTLR, schema.MULTI_TARGET_EMITTER_CTLR):
+            continue
+
+        start = _as_float(fields.get(schema.START_TIME), 0.0)
+        stop = _as_float(fields.get(schema.STOP_TIME), 0.0)
+        rate = _as_float(fields.get(schema.RATE), 0.0)
+
+        on, off = _window(fields)
+
+        if on is not None:
+            start, stop = on, off
+
+        return start, stop, rate
+
+    return None
+
+
+def _window(fields):
+    """The first on-period of the emitter-active track, or (None, None).
+
+    One period, because a Blender particle system has one emission window and
+    cannot express a second. Only a dozen or so of the game's effects blink at
+    all; the caller reports those rather than pretending to carry them.
+    """
+    try:
+        count = int(_as_float(fields.get(schema.WINDOW_KEY_COUNT), 0.0))
+    except (TypeError, ValueError):
+        return None, None
+
+    keys = []
+
+    for i in range(count):
+        time = fields.get(f"{schema.WINDOW_KEYS}{i}_time")
+        value = fields.get(f"{schema.WINDOW_KEYS}{i}_value")
+
+        if time is None or value is None:
+            continue
+
+        keys.append((_as_float(time, 0.0), _as_float(value, 0.0) != 0.0))
+
+    keys.sort(key=lambda k: k[0])
+
+    on = None
+
+    for time, emitting in keys:
+        if emitting and on is None:
+            on = time
+        elif not emitting and on is not None:
+            return on, time
+
+    return (on, None) if on is not None else (None, None)
+
+
+def _pulses(system_node):
+    """How many separate on-periods the emitter-active track has."""
+    for fields in _controllers(system_node):
+        if fields.get("type") not in (schema.EMITTER_CTLR, schema.MULTI_TARGET_EMITTER_CTLR):
+            continue
+
+        try:
+            count = int(_as_float(fields.get(schema.WINDOW_KEY_COUNT), 0.0))
+        except (TypeError, ValueError):
+            return 1
+
+        seen, on = 0, False
+
+        for i in range(count):
+            value = fields.get(f"{schema.WINDOW_KEYS}{i}_value")
+
+            if value is None:
+                continue
+
+            emitting = _as_float(value, 0.0) != 0.0
+
+            if emitting and not on:
+                seen += 1
+
+            on = emitting
+
+        return max(seen, 1)
+
+    return 1
+
+
+def _as_float(value, fallback=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _apply_emission(settings, system_node, scene, report):
+    """The emission window and the birth rate, as Blender states them.
+
+    ``frame_start``/``frame_end`` is Blender's emission window and is exactly
+    what the emitter-active track says. ``count`` is the number emitted over
+    that window, where the NIF gives a rate per second -- so the two are the
+    same statement once multiplied by the window's length.
+
+    Without this the window was the whole scene range and the count was the
+    engine's buffer capacity, which is a cap rather than a number emitted: a
+    campfire that emits for 3.3 seconds ran for the scene's 250 frames.
+    """
+    emission = emission_of(system_node)
+
+    if emission is None:
+        # An emitter controller a sequence drives leaves its span to the clip,
+        # and only its class's own fields on the node -- so there is a window,
+        # and it is not here. The windmill's splinters are the case: they fly
+        # from 18.8 to 22.5 seconds of `Break`, and Blender imports no curve for
+        # a custom property, so nothing in this scene knows that.
+        #
+        # Said rather than passed over, because the emission window that results
+        # is the whole timeline and looks as authoritative as a real one.
+        if any(k.startswith(schema.SEQUENCED_EMITTER) for k in system_node.keys()):
+            report.notes.append(
+                f"{system_node.name}: its emitter controller belongs to an "
+                "animation, so the emission window is in that clip rather than "
+                "on the node -- emitting over the whole timeline instead"
+            )
+
+        return False
+
+    start, stop, rate = emission
+
+    settings.frame_start = _seconds_to_frame(scene, start)
+
+    if stop is not None and stop > start:
+        settings.frame_end = _seconds_to_frame(scene, stop)
+    else:
+        # No off key: it emits for as long as there is anything to emit for.
+        settings.frame_end = scene.frame_end
+
+    if rate > 0.0:
+        span = (stop - start) if stop is not None and stop > start else 0.0
+
+        if span > 0.0:
+            # Blender's `count` is the total emitted between frame_start and
+            # frame_end, and the NIF gives a rate per second, so the two are the
+            # same statement once multiplied by the window.
+            #
+            # Not bounded by the data block's buffer, which _apply_emitter put
+            # here first. That buffer is the engine's allocation for particles
+            # alive *at once* -- roughly rate x lifetime, which is what the
+            # vanilla numbers show: the campfire's small flames emit 15 a second
+            # and live 0.47 of one, so seven are up at a time and the buffer is
+            # nine. Capping the total by it made that flame emit nine particles
+            # over three and a third seconds instead of fifty.
+            settings.count = max(1, int(round(rate * span)))
+
+    pulses = _pulses(system_node)
+
+    if pulses > 1:
+        report.notes.append(
+            f"{system_node.name}: emits in {pulses} bursts; Blender has one "
+            "emission window, so the first is used"
+        )
+
+    return True
 
 
 def _apply_emitter(settings, emitter, system_node, scene, report, units):
@@ -501,6 +719,11 @@ def build_system(system_node, scene, scene_objects, report):
     units = _units_of(system_node)
 
     _apply_emitter(settings, emitter, system_node, scene, report, units)
+
+    # After the emitter, so a rate that says how many are emitted replaces the
+    # buffer size that only says how many fit.
+    _apply_emission(settings, system_node, scene, report)
+
     _apply_modifiers(settings, modifiers_of(system_node), system_node, report, units)
 
     settings[schema.GENERATED] = 1

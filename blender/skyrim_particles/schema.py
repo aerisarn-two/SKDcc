@@ -143,3 +143,39 @@ GENERATED = "skp_generated"
 
 #: On the object carrying the system: the particle node it was built from.
 SOURCE = "skp_source"
+
+# --- the controllers that configure the system ------------------------------
+
+#: On the system's node: how many structural controllers it carries. Mirror of
+#: ``FbxNodeControllers``.
+CONTROLLER_COUNT = "particle_controllers"
+
+#: Prefix on one of them, before its index: ``npc_0_type``, ``npc_0_flags``...
+CONTROLLER_PREFIX = "npc_"
+
+#: ``NiPSysEmitterCtlr``: when the system emits, and how fast.
+EMITTER_CTLR = "NiPSysEmitterCtlr"
+MULTI_TARGET_EMITTER_CTLR = "BSPSysMultiTargetEmitterCtlr"
+
+#: On a controller: the span it runs over, in seconds.
+START_TIME = "start_time"
+STOP_TIME = "stop_time"
+
+#: The birth rate, in particles per second. Almost always a bare value with no
+#: data block behind it -- 1,600 of the game's 1,704 emitter controllers -- so
+#: the interpolator's own ``value`` is the rate.
+RATE = "interpolator_value"
+
+#: The emitter-active track: 1 while emitting, 0 while not. Carried whole, so
+#: the keys are readable -- ``..._data_data_keys_0_time`` and ``_value``. 1,055
+#: of the 1,704 have no data block at all, which means always on.
+WINDOW = "visibility_interpolator_data_data_"
+WINDOW_KEYS = WINDOW + "keys_"
+WINDOW_KEY_COUNT = WINDOW + "num_keys"
+
+#: Prefix on the fields of a controller a *sequence* drives. NIFBX carries the
+#: class's own fields here and leaves the span and the keys to the clip, so a
+#: node with one of these has an emitter controller whose window is in an
+#: animation rather than on the node.
+SEQUENCED_PREFIX = "nac_"
+SEQUENCED_EMITTER = SEQUENCED_PREFIX + EMITTER_CTLR

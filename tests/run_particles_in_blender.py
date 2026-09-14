@@ -101,6 +101,54 @@ def main():
         if speed > 0 and units < 0.5:
             check(f"{node.name} speed is converted", moving != speed, True)
 
+        # The emission window, which is the thing a Blender pass used to lose
+        # entirely: the emitter controller went into an animation stack and
+        # Blender does not import curves on custom properties.
+        emission = build.emission_of(node)
+
+        if emission is not None:
+            start, stop, rate = emission
+
+            check(
+                f"{node.name} emission starts",
+                carrier.frame_start,
+                scene.frame_start + int(round(start * fps)),
+            )
+
+            if stop is not None and stop > start:
+                check(
+                    f"{node.name} emission ends",
+                    carrier.frame_end,
+                    scene.frame_start + int(round(stop * fps)),
+                )
+
+                # Not the whole scene, which is what it was before the window
+                # travelled -- a campfire emitting for 3.3 seconds ran for 250
+                # frames.
+                check(
+                    f"{node.name} window is not the scene",
+                    carrier.frame_end < scene.frame_end,
+                    True,
+                )
+
+                # The count is a number emitted over the window, where the file
+                # gives a rate per second, bounded by the engine's buffer.
+                if rate > 0:
+                    check(
+                        f"{node.name} count",
+                        carrier.count,
+                        max(1, int(round(rate * (stop - start)))),
+                    )
+
+                    # And that the buffer is not what it is. The buffer sizes
+                    # the particles alive at once, so a flame emitting 15 a
+                    # second for 3.3 of them emits 50, whatever its buffer of
+                    # nine says.
+                    budget = int(float(node.get(schema.MAX_VERTICES, 0)) or 0)
+
+                    if budget and rate * (stop - start) > budget:
+                        check(f"{node.name} count is not the buffer", carrier.count > budget, True)
+
         # A system with no gravity modifier must not fall: Blender applies scene
         # gravity to every particle and Skyrim does not.
         kinds = {m.get(schema.MODIFIER, "") for m in build.modifiers_of(node)}

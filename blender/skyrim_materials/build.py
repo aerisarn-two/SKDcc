@@ -738,7 +738,18 @@ def build_lighting_material(material, report):
         else:
             tree.link(base.outputs["Color"], principled, "Base Color")
 
-        if _bit(flags1, schema.SF1_VERTEX_ALPHA) or alpha_value < 1.0:
+        # Vertex alpha, an alpha already below one, or a NiAlphaProperty that
+        # says this surface's alpha means something. That last case was missing,
+        # and it is the commonest of the three: a chicken's comb and tail
+        # feathers are cut out by an alpha test -- alpha_test_enable with a
+        # threshold of 128 -- and with nothing driving the Principled's Alpha
+        # the cutout stayed opaque and the bird wore black flaps.
+        cut_out = (
+            _get(material, schema.ALPHA_TEST, False)
+            or _get(material, schema.ALPHA_BLEND, False)
+        )
+
+        if _bit(flags1, schema.SF1_VERTEX_ALPHA) or alpha_value < 1.0 or cut_out:
             if vertex_alpha is not None and _bit(flags1, schema.SF1_VERTEX_ALPHA):
                 both = tree.add("ShaderNodeMath", column=3, row=1, operation="MULTIPLY")
                 tree.link(base.outputs["Alpha"], both, 0)

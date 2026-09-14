@@ -124,6 +124,16 @@ def main():
                     check(f"{material.name} is not made metal",
                           round(node.inputs["Metallic"].default_value, 3) < 1.0, True)
 
+                    # If the file says this surface's alpha means something,
+                    # something has to be driving it. A chicken's comb and tail
+                    # are cut out by an alpha test, and with the Principled's
+                    # Alpha left at 1.0 the cutout stayed opaque and the bird
+                    # wore black flaps where its feathers should be.
+                    if (material.get(schema.ALPHA_TEST, False)
+                            or material.get(schema.ALPHA_BLEND, False)):
+                        check(f"{material.name} alpha is driven",
+                              bool(node.inputs["Alpha"].links), True)
+
                     scale = float(material.get(schema.ENVIRONMENT_MAP_SCALE, 0.0) or 0.0)
 
                     if scale > 0 and "Specular IOR Level" in node.inputs:

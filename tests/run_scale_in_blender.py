@@ -51,8 +51,24 @@ def main():
     # than quietly testing nothing.
     check("the importer got it wrong", len(set(before.values())) > 1, True)
 
+    basis_before = {o.name: o.matrix_basis.copy() for o in scene.objects}
+
     corrected, unparented = fix.fix(scene)
     bpy.context.view_layer.update()
+
+    # Nothing durable is written, and that is the point rather than an
+    # oversight: matrix_world is derived, so assigning a value computed out of
+    # matrix_basis puts back the basis that was already there. What this fixes
+    # is the cache hanging off it, which hide_viewport leaves stale because the
+    # object is out of the depsgraph. If this ever starts writing a scale, the
+    # add-on has stopped doing what its docstring says.
+    moved = [
+        n for n, m in basis_before.items()
+        if any(abs(m[r][c] - bpy.data.objects[n].matrix_basis[r][c]) > 1e-6
+               for r in range(4) for c in range(4))
+    ]
+
+    check("no stored transform is rewritten", moved, [])
 
     after = scales(scene)
     print(f"     scales after:  {sorted(set(after.values()))}")

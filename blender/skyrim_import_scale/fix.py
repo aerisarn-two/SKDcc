@@ -20,6 +20,26 @@ The repair is to recompute a world matrix the way Blender itself would:
 which for a correctly imported object gives back what it already has, and for a
 hidden one gives the scale it should have had. Nothing is guessed and no factor
 is written down: the number comes from the parent the object already has.
+
+What that means in Blender's terms is narrower than "repair", and worth being
+plain about, because the name of this add-on promises more. ``matrix_world`` is
+derived, and assigning it sets ``matrix_basis`` to whatever produces it -- so
+assigning a value computed *from* ``matrix_basis`` writes back the basis that
+was already there. Measured on the campfire: every object it reports as
+corrected comes out with the same ``matrix_basis`` it went in with, give or
+take the rounding of composing a matrix and decomposing it again -- the
+difference is below 1e-6 and above 1e-9, which is the signature of a round trip
+through floating point rather than of a repair.
+
+The durable data was never wrong. What was wrong was the cached
+``matrix_world`` hanging off it, and only on hidden objects -- ``hide_viewport``
+takes an object out of the depsgraph, so nothing ever recomputes its cache and
+a bare ``view_layer.update()`` moves none of them. Anything that reads
+``obj.matrix_world`` on one of those gets whatever the importer left there,
+which is how a 2 metre collision hull measured 197.
+
+So this makes those reads true, and that is all it does. It is a snapshot: move
+the parent of a hidden object afterwards and the cache is stale again.
 """
 
 import bpy
@@ -51,9 +71,12 @@ def _differs(a, b, tolerance=1e-6):
 
 
 def fix(scene):
-    """Every object whose world matrix disagrees with its own parent chain.
+    """Refresh the world matrix of every object whose cache disagrees with it.
 
-    Returns the objects corrected, and the ones that could not be: a hidden
+    In practice that is the hidden ones and nothing else -- see the module
+    docstring for why the stored transform was never the thing that was wrong.
+
+    Returns the objects refreshed, and the ones that could not be: a hidden
     object at the top of the scene has no parent to recompute from, and this
     will not invent a scale for it.
     """

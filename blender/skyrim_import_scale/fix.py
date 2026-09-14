@@ -131,8 +131,33 @@ def hide_from_render(scene):
     hidden = []
 
     for obj in scene.objects:
-        if obj.hide_viewport and not obj.hide_render:
+        if not obj.hide_viewport:
+            continue
+
+        if not obj.hide_render:
             obj.hide_render = True
-            hidden.append(obj.name)
+
+        # And hidden the other way, which is the half that makes the repair
+        # stick. Blender has two kinds of hiding and they are not the same
+        # thing: `hide_viewport` -- the monitor icon -- takes the object out of
+        # the depsgraph entirely, so nothing ever evaluates it and its cached
+        # world matrix stays whatever the importer left. `hide_set` -- the eye
+        # icon, per view layer -- only stops it being drawn.
+        #
+        # The importer uses the first. So a cow's collision capsule reads 88
+        # metres against a skeleton 1.8 metres tall, `fix` corrects it, the file
+        # is saved, and on reopening it is 88 metres again: the correction was a
+        # cache refresh and the cache is not evaluated. Moving the hiding to the
+        # eye leaves the object evaluated, so it comes out right and stays right.
+        obj.hide_viewport = False
+
+        try:
+            obj.hide_set(True)
+        except RuntimeError:
+            # No view layer to hide it in -- put it back rather than leave it
+            # visible, since being seen is worse than being stale.
+            obj.hide_viewport = True
+
+        hidden.append(obj.name)
 
     return hidden

@@ -53,12 +53,34 @@ INITIAL_COLOR = "initial_color"
 ORDER = "order"
 ACTIVE = "active"
 
+#: The axis every emitter births along, stated by the engine rather than by the
+#: file. ``NiPSEmitter::EmitParticles`` builds the direction as
+#:
+#:     kDir = (0, 0, 1)
+#:     if declination != 0:
+#:         kDir = (sin(dec)cos(plan), sin(dec)sin(plan), cos(dec))
+#:
+#: so declination is the polar angle from **local +Z** and the planar angle is
+#: the azimuth about it. A declination of zero is straight up the axis, not a
+#: random direction.
+EMISSION_AXIS = (0.0, 0.0, 1.0)
+
 #: The volume an emitter births into. Box has all three; cylinder has the last
 #: two; a sphere has only its radius.
 WIDTH = "width"
 DEPTH = "depth"
 HEIGHT = "height"
 RADIUS = "radius"
+
+#: A volume emitter births inside the object this names, and the direction it
+#: births along is that object's local +Z -- see EMISSION_AXIS.
+EMITTER_OBJECT = "emitter_object" + LINK_SUFFIX
+
+#: ``NiPSysMeshEmitter``: where a particle's first velocity comes from.
+#: ``NiPSMeshEmitter.h`` names them: 0 is VELOCITY_USE_NORMALS, 1 RANDOM,
+#: 2 DIRECTION.
+INITIAL_VELOCITY_TYPE = "initial_velocity_type"
+USE_NORMALS = 0
 
 #: A mesh emitter births from the surface of named objects.
 NUM_EMITTER_MESHES = "num_emitter_meshes"

@@ -136,6 +136,37 @@ def _named(scene_objects, name):
     return None
 
 
+def _named_frame(scene, name):
+    """The frame a link names, which may not be an object at all.
+
+    An emitter's frame is usually an empty and sometimes a bone: NIFBX writes a
+    node as a ``LimbNode`` where the NIF has it in a skeleton, and Blender turns
+    every LimbNode into a bone inside an armature rather than into an object. A
+    candle's ``CandleFlame01-Emitter`` is one of those, and looking only among
+    objects finds nothing and quietly falls back to the wrong frame.
+
+    Returns ``(object, matrix)``: the object to parent to, and the world matrix
+    the frame actually has.
+    """
+    objects = {obj.name: obj for obj in scene.objects}
+    found = _named(objects, name)
+
+    if found is not None:
+        return found, found.matrix_world.copy()
+
+    wanted = _sanitize(str(name))
+
+    for obj in scene.objects:
+        if obj.type != "ARMATURE":
+            continue
+
+        for bone in obj.data.bones:
+            if bone.name in (name, wanted) or _plain(bone.name) == wanted:
+                return obj, obj.matrix_world @ bone.matrix_local
+
+    return None, None
+
+
 def _emitter_mesh(emitter, scene_objects):
     """The object a mesh emitter births from, if the scene still has it."""
     count = int(_float(emitter, schema.NUM_EMITTER_MESHES, 0.0))
@@ -203,10 +234,36 @@ def _apply_emitter(settings, emitter, system_node, scene, report):
     if life > 0.0:
         settings.lifetime_random = min(1.0, max(0.0, spread / life))
 
-    # Blender's normal_factor is speed along the emitting normal, which is what
-    # a Skyrim emitter's Speed means for a mesh emitter and the closest thing to
-    # it for a volume.
-    settings.normal_factor = _float(emitter, schema.SPEED, 0.0)
+    #
+    # Which way they go. NiPSEmitter::EmitParticles builds the direction as
+    # (0,0,1) turned by the declination and planar angles, so a particle leaves
+    # along the emitter's local +Z unless the declination says otherwise -- a
+    # candle flame with a declination of zero goes straight up.
+    #
+    # Blender's normal_factor is speed along the emitting *normal*, and a volume
+    # has none: it emits in every direction, which is what a torch converted this
+    # way looked like. object_align_factor is speed along the emitter object's
+    # own axes, which is the same statement the engine makes, so that is what
+    # carries the speed.
+    #
+    # A mesh emitter is the exception the engine makes too: with
+    # VELOCITY_USE_NORMALS it births along the surface normal, and there
+    # normal_factor is exactly right.
+    speed = _float(emitter, schema.SPEED, 0.0)
+    kind = _get(emitter, schema.MODIFIER, "")
+
+    along_normals = (
+        kind == "NiPSysMeshEmitter"
+        and int(_float(emitter, schema.INITIAL_VELOCITY_TYPE, 0.0)) == schema.USE_NORMALS
+    )
+
+    if along_normals:
+        settings.normal_factor = speed
+        settings.object_align_factor = (0.0, 0.0, 0.0)
+    else:
+        settings.normal_factor = 0.0
+        settings.object_align_factor = tuple(a * speed for a in schema.EMISSION_AXIS)
+
     settings.factor_random = _float(emitter, schema.SPEED_VARIATION, 0.0)
 
     radius = _float(emitter, schema.INITIAL_RADIUS, 1.0)
@@ -379,8 +436,24 @@ def build_system(system_node, scene, scene_objects, report):
             return None
 
         carrier = _volume_for(emitter, kind, f"{system_node.name}_emitter")
-        carrier.parent = system_node
-        carrier.matrix_parent_inverse.identity()
+
+        # Under the frame the emitter names, where it names one. That frame is
+        # what the direction is measured in -- the engine turns (0,0,1) by the
+        # declination in *its* axes -- so hanging the volume anywhere else
+        # points the particles somewhere else.
+        named = _get(emitter, schema.EMITTER_OBJECT, "")
+        frame, where = _named_frame(scene, str(named)) if named else (None, None)
+
+        if frame is None:
+            carrier.parent = system_node
+            carrier.matrix_parent_inverse.identity()
+        else:
+            # Placed at the frame rather than bone-parented to it: Blender hangs
+            # a bone's children off its *tail*, and these belong at the head.
+            carrier.parent = frame
+            carrier.matrix_parent_inverse = frame.matrix_world.inverted()
+            carrier.matrix_basis = where
+
         own = True
 
     # Through the modifier rather than bpy.ops.object.particle_system_add: the

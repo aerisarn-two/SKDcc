@@ -95,10 +95,27 @@ Blender particle system from it: the emitter's speed, lifespan and size, the
 drag modifier's damping, the rotation modifier's spin, the spawn modifier's
 children.
 
+Direction comes from the engine rather than from a guess. `NiPSEmitter::
+EmitParticles` builds it as `(0,0,1)` turned by the declination and planar
+angles, so a particle leaves along the emitter frame's local **+Z** — a candle
+flame with a declination of zero goes straight up. Blender's `normal_factor` is
+speed along the emitting *normal*, and a volume has none, so using it made every
+effect fire in all directions; the speed goes on `object_align_factor` instead,
+which is the same statement the engine makes. A mesh emitter set to
+`VELOCITY_USE_NORMALS` is the exception the engine makes too, and there
+`normal_factor` is exactly right.
+
 Blender emits from a mesh and Skyrim emits from a volume or from a named mesh,
 so the system is put on the object a mesh emitter names, or on a wire primitive
 matching the box, cylinder or sphere the emitter describes. Over 40 of the
 game's effect meshes — 125 systems, all four emitter kinds — every one builds.
+
+**Import effects with Automatic Bone Orientation off.** An emitter's frame is
+often a bone — NIFBX writes a node as a `LimbNode` where the NIF has it in a
+skeleton, and Blender turns every LimbNode into a bone — and that option
+re-orients bones. Measured on a candle: with it off every emitter bone has
+`+Z = (0, 0, 1)`, and with it on every one has `(0, 0, -1)`, so the flame emits
+downwards. It is the right option for a creature rig and the wrong one here.
 
 It is one direction, and deliberately. Blender's particle system is not a
 superset of Skyrim's: there is no cone half-angle, and colour and size over a

@@ -29,10 +29,17 @@ from . import schema
 AGE = "Age"
 LIFETIME = "Lifetime"
 VELOCITY = "Velocity"
+SEED = "Seed"
 
 #: On the instance domain, for the shader. Named for what a material asks for
 #: rather than for what the simulation calls it.
 PARTICLE_AGE = "ParticleAge"
+
+#: One number per particle, fixed for its life. The atlas needs it: a
+#: BSPSysSubTexModifier starts each particle on a different frame, and a system
+#: with cells but no modifier gives each particle one cell and leaves it there
+#: -- sixteen smoke puffs are sixteen shapes, not one shape sixteen times.
+PARTICLE_SEED = "ParticleSeed"
 
 
 def _out(node, name="Value"):
@@ -217,7 +224,11 @@ def build_group(name, settings, sprite):
     g.link(instances.outputs["Instances"], published, "Geometry")
     g.link(fraction.outputs[0], _value_socket(published))
 
-    g.link(published.outputs["Geometry"], out, out.inputs[0])
+    seeded = g.store(2150, 0, PARTICLE_SEED, "FLOAT", domain="INSTANCE")
+    g.link(published.outputs["Geometry"], seeded, "Geometry")
+    g.link(_Graph.read(g.named(1950, -700, SEED)), _value_socket(seeded))
+
+    g.link(seeded.outputs["Geometry"], out, out.inputs[0])
 
     return tree
 
@@ -358,7 +369,19 @@ def _spawn(g, settings):
     else:
         _value_socket(thrown).default_value = tuple(a * speed for a in schema.EMISSION_AXIS)
 
-    return thrown
+    # And a number of its own, drawn once and kept. Anything that has to differ
+    # between particles but not over one particle's life reads this: which atlas
+    # cell it wears, which frame its animation starts on.
+    marked = g.store(1400, 500, SEED, "FLOAT")
+    g.link(thrown.outputs["Geometry"], marked, "Geometry")
+
+    die = g.add("FunctionNodeRandomValue", 1250, 300, data_type="FLOAT")
+    die.inputs[2].default_value = 0.0
+    die.inputs[3].default_value = 1.0
+    _vary(g, die, index, frame)
+    g.link(_out(die), _value_socket(marked))
+
+    return marked
 
 
 def _billboard(g, camera):

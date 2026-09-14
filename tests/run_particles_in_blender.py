@@ -211,14 +211,21 @@ def main():
     # And the age reaches the shader, which is the whole reason for the
     # simulation: Eevee does not implement the Particle Info node, so a fade
     # driven from it renders nothing at all.
-    published = any(
-        node.type == "STORE_NAMED_ATTRIBUTE"
-        and node.inputs["Name"].default_value == simulation.PARTICLE_AGE
-        for group in bpy.data.node_groups
-        for node in group.nodes
-    )
+    def stored(name):
+        return any(
+            node.type == "STORE_NAMED_ATTRIBUTE"
+            and node.inputs["Name"].default_value == name
+            and node.domain == "INSTANCE"
+            for group in bpy.data.node_groups
+            for node in group.nodes
+        )
 
-    check("the age is published for the shader", published, True)
+    check("the age is published for the shader", stored(simulation.PARTICLE_AGE), True)
+
+    # And a number that does not change as the particle ages, which the atlas
+    # needs: a sheet with no BSPSysSubTexModifier gives each particle one cell
+    # and leaves it there, and one with a modifier starts each on its own frame.
+    check("a per-particle seed is published", stored(simulation.PARTICLE_SEED), True)
 
     # And taking it away leaves the scene as it was found.
     before = len(scene.objects)

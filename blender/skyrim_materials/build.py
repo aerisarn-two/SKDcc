@@ -804,15 +804,23 @@ def build_lighting_material(material, report):
     ) or (_bit(flags1, schema.SF1_EYE_ENVIRONMENT_MAPPING) and schema.ST_EYE_ENVMAP in kind)
 
     if has_cube:
-        strength = _float(material, schema.ENVIRONMENT_MAP_SCALE, 0.0)
+        strength = min(max(_float(material, schema.ENVIRONMENT_MAP_SCALE, 0.0), 0.0), 1.0)
 
-        if "Metallic" in principled.inputs:
-            principled.inputs["Metallic"].default_value = min(max(strength, 0.0), 1.0)
+        # As a specular level, not as metallic. In the game the cubemap is a
+        # reflection *added on top of* the diffuse; Blender's Metallic is a
+        # statement that the surface has no diffuse at all, and the base colour
+        # tints its reflections instead. The lumbermill's waterwheel sets an
+        # environment map scale of 1, and carrying that across as metallic
+        # turned a wooden wheel into a mirror -- which, lit by distant suns in a
+        # scene with no environment to reflect, rendered black.
+        if "Specular IOR Level" in principled.inputs:
+            principled.inputs["Specular IOR Level"].default_value = 0.5 + 0.5 * strength
 
         report.notes.append(
             f"{material.name}: reflects a cubemap ({_slot_path(material, schema.SLOT_ENVIRONMENT)}) "
             "which Blender replaces with the scene's own reflections; its strength is "
-            "carried as metallic"
+            "carried as a specular level, since the game adds the reflection to the "
+            "surface rather than replacing the surface with it"
         )
 
     if _bit(flags2, schema.SF2_DOUBLE_SIDED):

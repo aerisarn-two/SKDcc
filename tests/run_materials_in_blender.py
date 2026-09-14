@@ -98,8 +98,27 @@ def main():
             else:
                 # A lighting shader goes to a Principled BSDF, which is the whole
                 # claim: it is not NifSkope's shader and does not pretend to be.
-                check(f"{material.name} principled",
-                      len(nodes_of(material, "BSDF_PRINCIPLED")), 1)
+                principled = nodes_of(material, "BSDF_PRINCIPLED")
+                check(f"{material.name} principled", len(principled), 1)
+
+                # A cubemap is a reflection the game adds on top of the surface,
+                # and Blender's Metallic says the surface has no diffuse at all.
+                # Carrying the environment map scale across as metallic turned
+                # the lumbermill's wooden waterwheel into a mirror, which -- lit
+                # by distant suns with no environment to reflect -- came out
+                # black.
+                if principled:
+                    node = principled[0]
+
+                    check(f"{material.name} is not made metal",
+                          round(node.inputs["Metallic"].default_value, 3) < 1.0, True)
+
+                    scale = float(material.get(schema.ENVIRONMENT_MAP_SCALE, 0.0) or 0.0)
+
+                    if scale > 0 and "Specular IOR Level" in node.inputs:
+                        check(f"{material.name} reflects through the specular level",
+                              round(node.inputs["Specular IOR Level"].default_value, 3),
+                              round(0.5 + 0.5 * min(max(scale, 0.0), 1.0), 3))
 
             continue
 

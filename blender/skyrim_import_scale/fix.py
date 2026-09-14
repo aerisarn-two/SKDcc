@@ -76,9 +76,9 @@ def fix(scene):
     In practice that is the hidden ones and nothing else -- see the module
     docstring for why the stored transform was never the thing that was wrong.
 
-    Returns the objects refreshed, and the ones that could not be: a hidden
-    object at the top of the scene has no parent to recompute from, and this
-    will not invent a scale for it.
+    Returns the objects refreshed, and the ones that could not be: an object at
+    the top of the scene has no parent to recompute from, and one parented to a
+    bone or a vertex is placed by a composition this does not do.
     """
     corrected = []
     unparented = []
@@ -88,6 +88,17 @@ def fix(scene):
             if obj.hide_viewport:
                 unparented.append(obj.name)
 
+            continue
+
+        # Only where the composition below is the one Blender uses. A bone-
+        # parented object is placed by the bone's own matrix and the bone's
+        # length, not by the armature's world matrix -- a cow skeleton hangs all
+        # 24 of its ragdoll bodies off bones, and recomputing those this way
+        # wrote a wrong matrix onto every one of them and then did it again on
+        # the next pass, because the value it wrote was never the value it would
+        # read back. Vertex parenting is the same story.
+        if obj.parent_type != "OBJECT":
+            unparented.append(obj.name)
             continue
 
         want = obj.parent.matrix_world @ obj.matrix_parent_inverse @ obj.matrix_basis

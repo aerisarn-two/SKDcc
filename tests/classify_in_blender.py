@@ -11,7 +11,7 @@ each file first.
 
 Prints one line per file, which `run.sh` reads:
 
-    <path> particles=<n> materials=<n> joints=<n> meshes=<n> rigs=<n>
+    <path> particles=<n> materials=<n> joints=<n> meshes=<n> rigs=<n> clips=<n>
 """
 
 import os
@@ -48,6 +48,7 @@ def main():
             f" joints={len(list(joints_in(scene.objects)))}"
             f" meshes={sum(1 for o in scene.objects if o.type == 'MESH')}"
             f" rigs={sum(1 for o in scene.objects if o.type == 'ARMATURE')}"
+            f" clips={len(bpy.data.actions)}"
         )
 
 

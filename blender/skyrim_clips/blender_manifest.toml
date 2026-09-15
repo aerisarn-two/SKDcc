@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+id = "skyrim_clips"
+version = "0.1.0"
+name = "Skyrim Clips"
+tagline = "Put one of a creature's clips on its rig, at that clip's length"
+maintainer = "Aerisarn <aerisarn@gmail.com>"
+type = "add-on"
+license = ["SPDX:GPL-3.0-or-later"]
+blender_version_min = "4.2.0"

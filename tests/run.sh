@@ -98,6 +98,9 @@ suite "blender import scale" run_scale_in_blender.py meshes
 # and a file with a mesh has both or neither.
 suite "blender export" run_export_in_blender.py meshes
 
+# Only a file that brought animations with it has anything to play.
+suite "blender clips" run_clips_in_blender.py clips
+
 echo
 echo "$failures failure(s)"
 exit "$failures"

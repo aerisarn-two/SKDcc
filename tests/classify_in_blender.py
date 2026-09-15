@@ -11,7 +11,7 @@ each file first.
 
 Prints one line per file, which `run.sh` reads:
 
-    <path> particles=<n> materials=<n> joints=<n> meshes=<n>
+    <path> particles=<n> materials=<n> joints=<n> meshes=<n> rigs=<n>
 """
 
 import os
@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(HERE), "blender"))
 from skyrim_havok_constraints.joint import joints_in  # noqa: E402
 from skyrim_materials import build as materials       # noqa: E402
 from skyrim_particles import build as particles       # noqa: E402
+from skyrim_rig import build as rig                   # noqa: E402
 
 
 def main():
@@ -46,6 +47,7 @@ def main():
             f" materials={sum(1 for m in bpy.data.materials if materials.is_skyrim_material(m))}"
             f" joints={len(list(joints_in(scene.objects)))}"
             f" meshes={sum(1 for o in scene.objects if o.type == 'MESH')}"
+            f" rigs={sum(1 for o in scene.objects if o.type == 'ARMATURE')}"
         )
 
 

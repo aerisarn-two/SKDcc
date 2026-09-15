@@ -87,6 +87,7 @@ suite() {
 suite "blender constraints" run_in_blender.py joints
 suite "blender particles" run_particles_in_blender.py particles
 suite "blender materials" run_materials_in_blender.py materials
+suite "blender rig" run_rig_in_blender.py rigs
 
 # The import repair works on anything converted, so it runs against every file
 # that has a mesh to be at the wrong scale.

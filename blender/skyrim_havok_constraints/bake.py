@@ -15,6 +15,15 @@ from . import bodies, limits, schema
 from .blender_compat import evaluated
 from .joint import Joint, joints_in
 
+#: What Blender will hold in an object name. Past this it stores a truncated
+#: name with a hash on the end, so a longer name cannot be written at all -- it
+#: can only be replaced by something else.
+#:
+#: Here rather than in `schema`, which is the three hosts' shared vocabulary for
+#: what the *file* calls things. This is Blender's own limit; Maya and Max do
+#: not share it.
+NAME_LIMIT = 63
+
 
 class Baked:
     def __init__(self):
@@ -75,17 +84,41 @@ def _write_names(obj, joint, rbc, result):
     that survives any rename, and the names in the file are regenerated from it
     on the way out. A joint whose name Blender truncated comes back whole.
     """
-    body_a = _body_of(rbc.object1)
-    body_b = _body_of(rbc.object2)
+    owner_a = _owner_of(rbc.object1)
+    owner_b = _owner_of(rbc.object2)
 
-    if body_a is None or body_b is None:
+    if owner_a is None or owner_b is None:
         result.problems.append("%s: a constraint object is not a Havok body" % obj.name)
         return
 
-    obj[schema.BODY_A] = body_a
-    obj[schema.BODY_B] = body_b
+    obj[schema.BODY_A] = _havok_name_of(owner_a)
+    obj[schema.BODY_B] = _havok_name_of(owner_b)
+
+    body_a = _clean_name(owner_a)
+    body_b = _clean_name(owner_b)
 
     wanted = "%s%s%s%s" % (body_b, schema.NAME_SEPARATOR, body_a, schema.ATTACH_SUFFIX)
+
+    # The properties above are the answer; the name is a courtesy to whatever
+    # reads names. It is only worth writing if Blender can hold it.
+    #
+    # An object name caps at 63 bytes and the tail is replaced with a hash past
+    # that. A draugr's forearm-to-hand joint wants 85 -- so assigning it stores
+    # something like `..._rb_con_NPC4f2a91c6`, which is not the name asked for
+    # and is worse than the one already there. Writing the far frame's name then
+    # pushes it further over.
+    if len(wanted.encode("utf-8")) > NAME_LIMIT:
+        # Keep the separator, though: that is how ck-cmd recognises one of these
+        # at all, and a name with no `_con_` in it is invisible to it.
+        if schema.NAME_SEPARATOR not in obj.name:
+            obj.name = _short_name(body_a, body_b)
+            result.renamed += 1
+
+        result.problems.append(
+            "%s: the full name is %d bytes and Blender holds %d, so the bodies "
+            "are carried as properties only"
+            % (obj.name, len(wanted.encode("utf-8")), NAME_LIMIT))
+        return
 
     if obj.name != wanted:
         far = joint.far_frame
@@ -95,28 +128,62 @@ def _write_names(obj, joint, rbc, result):
         result.renamed += 1
 
 
-def _body_of(shape):
-    """The Havok body name a rigid body shape belongs to.
+def _short_name(body_a, body_b):
+    """A name that fits and still says what kind of node this is.
+
+    Not a reference -- the properties hold that. Just enough for a reader that
+    goes by name to see an attachment point, with whatever of the body names
+    will fit either side of the separator.
+    """
+    room = NAME_LIMIT - len(schema.NAME_SEPARATOR) - len(schema.ATTACH_SUFFIX)
+    half = max(room // 2, 1)
+
+    return "%s%s%s%s" % (
+        body_b[:half], schema.NAME_SEPARATOR, body_a[:half], schema.ATTACH_SUFFIX)
+
+
+def _owner_of(shape):
+    """The Havok body a rigid body shape belongs to.
 
     The rigid body lives on the shape mesh and the Havok body is its parent, so
-    the name wanted is the parent's -- with Blender's ``.001`` stripped, since
-    that is a Blender fact and not part of the file.
+    the object wanted is the parent's -- unless the body carries the shape
+    itself, which a single-shape body does.
     """
     if shape is None:
         return None
 
-    owner = shape if shape.name.endswith(schema.BODY_SUFFIX) else shape.parent
+    owner = shape if _clean_name(shape).endswith(schema.BODY_SUFFIX) else shape.parent
 
     if owner is None:
         return None
 
-    name = owner.name
-    head, _, tail = name.rpartition(".")
+    return owner if _clean_name(owner).endswith(
+        (schema.BODY_SUFFIX, schema.PHANTOM_SUFFIX)) else None
 
-    if head and tail.isdigit():
-        name = head
 
-    return name if name.endswith((schema.BODY_SUFFIX, schema.PHANTOM_SUFFIX)) else None
+def _clean_name(obj):
+    """An object's name with Blender's ``.001`` off, which is a Blender fact
+    and not part of the file."""
+    head, _, tail = obj.name.rpartition(".")
+
+    return head if head and tail.isdigit() else obj.name
+
+
+def _havok_name_of(owner):
+    """The name a constraint calls this body by.
+
+    Two vocabularies meet here. A creature exported with its skeleton.hkx has
+    been through SKAssets' joint bridge, which rewrites ``constraint_body_a``
+    and ``constraint_body_b`` into the *ragdoll's* names because that is what
+    HKFBX reads them as, while the node names stay in the mesh's. The body
+    itself carries the translation, under ``hkb_ragdoll_bone``.
+
+    So the reference answers in whichever vocabulary the scene is written in:
+    the ragdoll's when the bodies know one, the mesh's when they do not. Taking
+    the object name unconditionally would quietly move a bridged joint back
+    into mesh names, and HKFBX would then find neither body.
+    """
+    return str(owner.get(schema.RAGDOLL_BONE, "")) or _clean_name(owner)
 
 
 # --- R1: the descriptor dump is updated, never replaced --------------------

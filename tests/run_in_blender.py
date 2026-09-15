@@ -171,20 +171,49 @@ def main():
 
     # --- R3: a mangled name is rebuilt from the pointers -------------------
 
+    from skyrim_havok_constraints import bodies as bodies_module
+
     victim = hinges[1]
     body_a = Joint(victim).body_a_name
     body_b = Joint(victim).body_b_name
+
+    # Two vocabularies, and the check has to hold both. A creature exported with
+    # its skeleton.hkx has been through SKAssets' joint bridge: the properties
+    # name the bodies as the *ragdoll* knows them (`Ragdoll_Neck03`) because that
+    # is what HKFBX reads, while the node names stay as the *mesh* knows them
+    # (`Neck2_rb`). So the properties must come back in ragdoll names and the
+    # node name in mesh names, and asking either to be the other is wrong.
+    object_a = bodies_module.find_body(objects, body_a)
+    object_b = bodies_module.find_body(objects, body_b)
     at = victim.name.find(schema.NAME_SEPARATOR)
     victim.name = victim.name[:at + len(schema.NAME_SEPARATOR) + 3] + "4f2a91c6"
     mangled = victim.name
     victim.rigid_body_constraint.limit_ang_x_upper += 0.01  # so it counts as edited
 
     baked = bake.bake(objects)
-    rebuilt = "%s%s%s%s" % (body_b, schema.NAME_SEPARATOR, body_a, schema.ATTACH_SUFFIX)
-    check("R3: a truncated name is rebuilt from the object pointers",
-          victim.name == rebuilt, "%s -> %s" % (mangled, victim.name))
+    rebuilt = "%s%s%s%s" % (object_b.name, schema.NAME_SEPARATOR,
+                            object_a.name, schema.ATTACH_SUFFIX)
 
-    # --- R4: the far frame follows the joint -------------------------------
+    # The bodies come back from the pointers whatever the name does -- that is
+    # the part that matters, and the only part that can be relied on: a draugr's
+    # forearm-to-hand name wants 85 bytes and Blender holds 63, so on that rig
+    # the name cannot be restored at all.
+    check("R3: the bodies are rebuilt from the object pointers",
+          (victim.get(schema.BODY_A), victim.get(schema.BODY_B)) == (body_a, body_b),
+          "got %r/%r wanted %r/%r" % (victim.get(schema.BODY_A),
+                                      victim.get(schema.BODY_B), body_a, body_b))
+
+    if len(rebuilt.encode("utf-8")) <= bake.NAME_LIMIT:
+        check("R3: and so is the name, where Blender can hold it",
+              victim.name == rebuilt, "%s -> %s" % (mangled, victim.name))
+    else:
+        # It must still look like an attachment point, or a reader that goes by
+        # name stops seeing it.
+        check("R3: a name too long to restore still says what it is",
+              schema.NAME_SEPARATOR in victim.name and len(victim.name) <= bake.NAME_LIMIT,
+              True)
+        print(f"     the full name needs {len(rebuilt.encode('utf-8'))} bytes; "
+              f"kept {victim.name!r}")
 
     # --- R4: the far frame follows the joint -------------------------------
     #
@@ -192,8 +221,6 @@ def main():
     # hidden object has no evaluated transform, which is what made an earlier
     # version of this derivation miss by a whole unit; bake forces evaluation, so
     # all of them must now come out right.
-    from skyrim_havok_constraints import bodies as bodies_module
-
     moved = []
     for candidate in built:
         far_node = Joint(candidate).far_frame

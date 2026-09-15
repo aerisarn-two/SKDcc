@@ -28,6 +28,16 @@ def check(name, condition, detail=""):
         FAILURES.append(name)
 
 
+def _x_upper_of(schema, joint_object):
+    """Which property holds the X angular limit of this joint, and under which
+    nif.xml field name. A limited hinge calls it the max angle; a ragdoll calls
+    the same axis the twist."""
+    if schema.MAX_ANGLE in joint_object.keys():
+        return schema.MAX_ANGLE, "Max Angle"
+
+    return schema.TWIST_MAX, "Twist Max Angle"
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     fbx = os.path.abspath(argv[0]) if argv else None
@@ -146,19 +156,26 @@ def main():
 
     # --- R2: an edit is written back --------------------------------------
 
-    target = hinges[0]
-    before = float(target[schema.MAX_ANGLE])
+    # A hinge where the skeleton has one, and otherwise whatever it does have:
+    # a chicken's ragdoll is six ragdoll joints and no limited hinge at all, and
+    # the test used to stop there rather than exercise the rig it was given.
+    # Either way the edit is the constraint's X limit -- a hinge's swing is X,
+    # and so is a ragdoll's twist.
+    editable = hinges or built
+    target = editable[0]
+    upper_key, upper_field = _x_upper_of(schema, target)
+    before = float(target[upper_key])
     target.rigid_body_constraint.limit_ang_x_upper = before + 0.25
 
     baked = bake.bake(objects)
     print("     bake (one edit) ->", baked, flush=True)
     check("R2: an edited constraint is rewritten", baked.rewritten == 1, str(baked))
 
-    after = float(target[schema.MAX_ANGLE])
+    after = float(target[upper_key])
     check("the edited angle reached the shared property",
           abs(after - (before + 0.25)) < 1e-5, "%.6f -> %.6f" % (before, after))
 
-    hkc = target.get(schema.field("Max Angle"))
+    hkc = target.get(schema.field(upper_field))
     check("and the hkc_ field, still as a string",
           isinstance(hkc, str) and abs(float(hkc) - after) < 1e-5, repr(hkc))
 
@@ -173,7 +190,7 @@ def main():
 
     from skyrim_havok_constraints import bodies as bodies_module
 
-    victim = hinges[1]
+    victim = editable[1]
     body_a = Joint(victim).body_a_name
     body_b = Joint(victim).body_b_name
 

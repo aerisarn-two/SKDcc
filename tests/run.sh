@@ -93,6 +93,11 @@ suite "blender rig" run_rig_in_blender.py rigs
 # that has a mesh to be at the wrong scale.
 suite "blender import scale" run_scale_in_blender.py meshes
 
+# The export settings apply to whatever the scene is, so this runs against every
+# file with a mesh too -- the mistakes it catches are about the rig and the axes,
+# and a file with a mesh has both or neither.
+suite "blender export" run_export_in_blender.py meshes
+
 echo
 echo "$failures failure(s)"
 exit "$failures"

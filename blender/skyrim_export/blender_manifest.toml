@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+id = "skyrim_export"
+version = "0.1.0"
+name = "Skyrim Export"
+tagline = "Export FBX the way the NIF and Havok converters expect it"
+maintainer = "Aerisarn <aerisarn@gmail.com>"
+type = "add-on"
+license = ["SPDX:GPL-3.0-or-later"]
+blender_version_min = "4.2.0"

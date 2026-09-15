@@ -164,6 +164,26 @@ def main():
 
     # --- and the settings are the ones that were measured -----------------
 
+    # --- and the clips are still named -------------------------------------
+    #
+    # Named on its own rather than left inside the count above, because it is the
+    # one property the whole animation set depends on. A Havok clip is identified
+    # by properties on its animation stack, which Blender has nowhere to keep, so
+    # SKAssets writes the same list on a node as well -- 17,846 bytes of it on a
+    # draugr -- and losing that turns 216 clips into 216 anonymous actions.
+
+    clips = "sk_clips"
+    sent = next((v[clips] for v in props.values() if clips in v), None)
+
+    if sent is None:
+        print("     no clip list in this file, so there is none to lose", flush=True)
+    else:
+        back = next((obj[clips] for obj in bpy.data.objects if clips in obj.keys()), None)
+        rows = len(str(sent).splitlines())
+
+        check("the clip list came back whole", back == sent,
+              "%d clips, %d bytes" % (rows, len(str(sent))))
+
     check("the axes are Blender's own, written out unchanged",
           (settings.AXIS_FORWARD, settings.AXIS_UP) == ("Y", "Z"),
           "%s / %s" % (settings.AXIS_FORWARD, settings.AXIS_UP))

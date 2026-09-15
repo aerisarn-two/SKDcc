@@ -21,16 +21,22 @@ class Exported:
         return text
 
 
-def write(scene, path, animations=False):
+def write(scene, path, animations=True):
     """Export the scene to `path` the way the game's converters expect it.
 
-    Animations are off by default, and that is not a performance choice. The
-    clips a creature scene arrives with are Havok clips, recorded on the FBX's
-    animation stacks as properties; Blender reads the curves and drops the
-    properties, so what leaves is 216 stacks that no longer say which clip each
-    one is, and the import counts none of them. Exporting them is still the
-    right thing when the animation is the point -- it just is not a round trip,
-    so it is asked for.
+    Animations are written, because a creature's clips are part of it. They did
+    not used to survive: a Havok clip is identified by properties on the FBX's
+    animation stack, Blender reads a stack as an action and an action has
+    nowhere to keep them, and the stacks Blender writes out are new ones it
+    named itself. A draugr went out with 216 clips and came back with 216
+    anonymous animations, which the import counted as none.
+
+    SKAssets now writes the same list on a node as well, where it survives like
+    every other custom property, and a stack that has lost its own properties is
+    found there by name. Measured on the draugr: 216 out, 216 back.
+
+    Turning them off is for when the animation genuinely is not wanted -- it is
+    most of the file's size and most of its export time.
     """
     with settings.at_rest(scene):
         bpy.ops.export_scene.fbx(**settings.options(

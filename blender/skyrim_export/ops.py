@@ -19,9 +19,9 @@ class SKDCC_OT_export_fbx(bpy.types.Operator, ExportHelper):
     animations: bpy.props.BoolProperty(
         name="Animations",
         description=("Write every action as an animation stack. A creature's Havok "
-                     "clips do not survive the trip, so this is for animation work "
-                     "rather than for putting the creature back"),
-        default=False)
+                     "clips are found again on the way back, so leave this on unless "
+                     "the animation is not wanted -- it is most of the file"),
+        default=True)
 
     def execute(self, context):
         report = export.write(context.scene, self.filepath, self.animations)

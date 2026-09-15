@@ -18,6 +18,11 @@ the body properties carry the escaped spelling, so they match the node names.
 # --- the shared convention -------------------------------------------------
 
 TYPE = "constraint_type"
+
+#: On a rigid body: the name Havok knows it by, which is not the name the NIF
+#: knows it by. A constraint names its bodies in Havok's terms whenever the
+#: creature was exported with its skeleton.hkx.
+RAGDOLL_BONE = "hkb_ragdoll_bone"
 WRAPPER = "constraint_wrapper"
 FRAME = "constraint_frame"
 BODY_A = "constraint_body_a"

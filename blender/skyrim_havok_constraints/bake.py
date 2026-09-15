@@ -299,5 +299,13 @@ The scale check is a backstop rather than an expected path. ``bake`` forces
     # A joint frame is a rotation and a pivot; any scale in the product is an
     # artefact of the two chains, so it is dropped rather than written out.
     location, rotation, _ = relative.decompose()
+
+    # Stored as a quaternion, not as Euler angles. An object keeps its rotation
+    # the way its `rotation_mode` says, and assigning a matrix decomposes into
+    # that -- so a frame landing near Euler's gimbal lock is quantised badly on
+    # the way in. The chicken's pelvis-to-neck frame is one: through XYZ it
+    # comes back 2.7e-5 out, through the quaternion 3e-7, from the same matrix.
+    # Nothing downstream reads the mode; the exporter writes what it composes.
+    far.rotation_mode = "QUATERNION"
     far.matrix_basis = (mathutils.Matrix.Translation(location)
                         @ rotation.to_matrix().to_4x4())

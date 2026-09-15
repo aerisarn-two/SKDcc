@@ -241,8 +241,14 @@ def main():
     check("bone limits are built", limited.built > 0,
           "%d; %s" % (limited.built, "; ".join(limited.problems[:3])))
 
-    armature = next(o for o in objects if o.type == "ARMATURE")
-    constrained = [b for b in armature.pose.bones
+    # Every armature, not the first one: a creature arrives as several nifs and
+    # imports as an armature each -- hair, body, skeleton -- and only the
+    # skeleton carries the ragdoll. Which one comes first is not fixed, so
+    # asking the first alone found a draugr's hair, said none of the seventeen
+    # limits had been built, and passed on the creatures that happen to have one.
+    constrained = [b
+                   for armature in objects if armature.type == "ARMATURE"
+                   for b in armature.pose.bones
                    if b.constraints.get(schema.BONE_LIMIT_NAME) is not None]
     check("the limits are on pose bones", len(constrained) == limited.built,
           "%d bones" % len(constrained))

@@ -158,8 +158,25 @@ add-on's to rewrite.
 ## Installing (Blender)
 
 Blender 4.2 or newer. `Edit ▸ Preferences ▸ Add-ons ▸ Install from Disk`, and
-pick the `skyrim_havok_constraints` folder zipped, or drop the folder into your
-`scripts/addons` directory.
+pick the folder you want zipped, or drop it into your `scripts/addons`
+directory. Each folder under `blender/` is its own add-on:
+
+| | |
+| --- | --- |
+| `skyrim_havok_constraints` | a ragdoll's joints, as real rigid body constraints |
+| `skyrim_materials` | Skyrim's shaders, as node trees |
+| `skyrim_particles` | a NIF's particle systems, in geometry nodes |
+| `skyrim_billboards` | a `NiBillboardNode`, as the constraint that aims it |
+| `skyrim_rig` | which of a creature's bones are sockets rather than bones |
+| `skyrim_import_scale` | the scale an import leaves wrong |
+| `skyrim_export` | the four settings a Skyrim scene has to leave with |
+| `skyrim_clips` | play one of a creature's animations, at that clip's length |
+
+`skyrim_clips` adds a **Skyrim** tab to the 3D view's sidebar (`N`): it lists
+every clip in the file, puts the chosen one on the rig, and sets the scene to
+that clip's length. The second button takes the clip off, which is what lets
+the NLA tracks through — an assigned action is evaluated after them and wins,
+so unmuting a track while one is assigned does nothing at all.
 
 ## Testing
 

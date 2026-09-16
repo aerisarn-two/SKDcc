@@ -39,10 +39,12 @@ def write(scene, path, animations=True):
     most of the file's size and most of its export time.
 
     The rest pose goes out with it. Blender's importer re-aims every bone to
-    draw it and cannot put it back; `rest.py` answers for the bones nobody has
-    moved since, so the rig that lands in the NIF is the rig that left it.
+    draw it and cannot put it back, so `rest.py` puts the stated pose on for
+    the duration of the write: the rig that lands in the NIF is the rig that
+    came out of it, and the rig on screen afterwards is the one somebody can
+    pose.
     """
-    with settings.at_rest(scene), rest.stated(scene):
+    with settings.at_rest(scene), rest.restored(scene):
         bpy.ops.export_scene.fbx(**settings.options(
             filepath=path,
             bake_anim=animations,

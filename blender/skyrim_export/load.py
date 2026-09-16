@@ -8,8 +8,8 @@ Bone orientation is the whole of it. Left off, every bone is drawn along the
 same axis and the rig is a heap of sticks -- correct, and not something anyone
 can pose. Turned on, Blender aims each bone down its own chain and the rig is
 usable, at the cost of rewriting the rest pose; `rest.py` is how that cost is
-paid back. So it is turned on here, and the pose the file arrived with is
-written down in the same breath.
+paid back, and why the file is read twice. So it is turned on here, and the
+pose the file states is taken off the unaimed pass and kept.
 """
 
 import bpy
@@ -36,7 +36,9 @@ def options(**overrides):
 
 
 def read(path):
-    """Import `path` and record the rest pose of every rig it brings in."""
+    """Import `path`, keeping the rest pose the aiming is about to overwrite."""
+    stated = rest.harvest(path)
+
     before = set(bpy.data.objects)
 
     bpy.ops.import_scene.fbx(**options(filepath=path))
@@ -44,4 +46,11 @@ def read(path):
     armatures = [o for o in bpy.data.objects
                  if o not in before and o.type == "ARMATURE"]
 
-    return sum(rest.record(o) for o in armatures), len(armatures)
+    kept = 0
+
+    for armature in armatures:
+        if armature.name in stated:
+            rest.remember(armature, stated[armature.name])
+            kept += 1
+
+    return kept, len(armatures)

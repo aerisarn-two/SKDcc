@@ -41,7 +41,11 @@ import mathutils
 #: properties are no use for this: Blender's importer drops a bone model's own,
 #: measured at 0 of 92 kept, and keeps only what is on the node it spends on the
 #: armature object.
-STATED = "sk_bone_rest"
+#:
+#: Named for this module rather than for bones in general. NIFBX 1.6.8 shipped a
+#: short-lived reader for a `sk_bone_rest` holding sixteen numbers a bone, and
+#: this holds eighteen; the name it never used keeps the two from meeting.
+STATED = "sk_rest_pose"
 
 
 def _table(entries):

@@ -10,3 +10,8 @@ CAP = "skdcc_socket_length"
 
 #: Where the non-deforming bones are collected, for hiding in one go.
 COLLECTION = "Sockets"
+
+#: The marker drawn in place of a bone whose direction is invented. Held in
+#: `bpy.data` and deliberately never linked to a scene, so it is a shape and
+#: not an object the exporter can find.
+MARKER = "SKDcc Joint"

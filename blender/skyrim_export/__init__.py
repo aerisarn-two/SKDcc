@@ -12,12 +12,12 @@ wrong value costs measured on a draugr. See `settings.py`.
 """
 
 bl_info = {
-    "name": "Skyrim Export",
+    "name": "Skyrim Import and Export",
     "author": "Aerisarn",
     "version": (0, 1, 0),
     "blender": (4, 2, 0),
-    "location": "File > Export > Skyrim (.fbx)",
-    "description": "Export FBX the way the NIF and Havok converters expect it",
+    "location": "File > Import/Export > Skyrim (.fbx)",
+    "description": "Read and write FBX the way the NIF and Havok converters expect it",
     "category": "Import-Export",
 }
 

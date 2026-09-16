@@ -33,16 +33,16 @@ class SKDCC_OT_export_fbx(bpy.types.Operator, ExportHelper):
 class SKDCC_OT_import_fbx(bpy.types.Operator, ImportHelper):
     bl_idname = "skdcc.import_fbx"
     bl_label = "Import FBX from Skyrim"
-    bl_description = ("Read a Skyrim FBX with its bones aimed down their chains, "
-                      "keeping the rest pose the file states so it can go back")
+    bl_description = ("Read a Skyrim FBX keeping the rest pose it states, so it "
+                      "can go back -- run Mark Sockets to draw the bones")
     bl_options = {"REGISTER", "UNDO"}
 
     filename_ext = ".fbx"
     filter_glob: bpy.props.StringProperty(default="*.fbx", options={"HIDDEN"})
 
     def execute(self, context):
-        bones, armatures = load.read(self.filepath)
-        self.report({"INFO"}, "%d bones in %d armatures" % (bones, armatures))
+        armatures = load.read(self.filepath)
+        self.report({"INFO"}, "%d armature(s)" % armatures)
 
         return {"FINISHED"}
 

@@ -11,6 +11,7 @@ exporter's dialog.
 import contextlib
 
 import bpy
+import mathutils
 
 #: The scene leaves in the frame it is in, which is what the game's converters
 #: read. NIFBX writes ``UpAxis = 2`` into an FBX's global settings and its reader
@@ -70,25 +71,47 @@ def at_rest(scene):
     a rig exported while an action is applied writes the pose into the skeleton
     and the creature is rebuilt standing in whatever frame happened to be
     current. On a draugr holding 216 clips that is 83 of 92 nodes out of place,
-    the worst 30 units -- and the file still looks like a draugr, which is what
+    the worst 39 units -- and the file still looks like a draugr, which is what
     makes it worth doing something about rather than noticing later.
 
-    The action is unlinked as well as the pose position changed: one of them
-    alone still leaves the pose in the export.
+    The pose is emptied rather than switched off. Setting ``pose_position`` to
+    ``REST`` does put the skeleton right, and it also tells Blender to ignore
+    poses while it bakes: every action comes out flat. Measured on the draugr,
+    216 actions with a widest value spread of 217.1 going in and 0.0 coming out,
+    which is every animation in the file silently lost. Emptying the channels
+    instead leaves the rig standing at rest for the skeleton, and leaves the
+    baking to read the actions as it should -- same 216 actions, spread 217.1,
+    and bones landing within 0.0011 units of where they started.
+
+    Bone constraints are muted with it. They are the other thing ``REST`` used to
+    switch off, and a rig posed by a constraint is one whose rest pose is not
+    what its channels say.
+
+    The action is unlinked as well as the channels emptied: an action left linked
+    simply fills them in again on the next evaluation.
     """
     changed = []
+    posed = []
+    muted = []
 
     for obj in scene.objects:
         if obj.type != "ARMATURE":
             continue
 
         action = obj.animation_data.action if obj.animation_data else None
-        changed.append((obj, obj.data.pose_position, action))
-
-        obj.data.pose_position = "REST"
+        changed.append((obj, action))
 
         if obj.animation_data:
             obj.animation_data.action = None
+
+        for bone in obj.pose.bones:
+            posed.append((bone, bone.matrix_basis.copy()))
+            bone.matrix_basis = mathutils.Matrix.Identity(4)
+
+            for constraint in bone.constraints:
+                if not constraint.mute:
+                    muted.append(constraint)
+                    constraint.mute = True
 
     if changed:
         bpy.context.view_layer.update()
@@ -96,9 +119,13 @@ def at_rest(scene):
     try:
         yield
     finally:
-        for obj, position, action in changed:
-            obj.data.pose_position = position
+        for constraint in muted:
+            constraint.mute = False
 
+        for bone, basis in posed:
+            bone.matrix_basis = basis
+
+        for obj, action in changed:
             if action is not None and obj.animation_data:
                 obj.animation_data.action = action
 

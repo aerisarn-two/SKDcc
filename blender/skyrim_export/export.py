@@ -2,7 +2,7 @@
 
 import bpy
 
-from . import rest, settings
+from . import settings
 
 
 class Exported:
@@ -38,13 +38,11 @@ def write(scene, path, animations=True):
     Turning them off is for when the animation genuinely is not wanted -- it is
     most of the file's size and most of its export time.
 
-    The rest pose goes out with it. Blender's importer re-aims every bone to
-    draw it and cannot put it back, so `rest.py` puts the stated pose on for
-    the duration of the write: the rig that lands in the NIF is the rig that
-    came out of it, and the rig on screen afterwards is the one somebody can
-    pose.
+    They survive because the rig is emptied of its pose rather than told to
+    ignore poses; see `settings.at_rest`, which is where every animation in the
+    file used to go.
     """
-    with settings.at_rest(scene), rest.restored(scene):
+    with settings.at_rest(scene):
         bpy.ops.export_scene.fbx(**settings.options(
             filepath=path,
             bake_anim=animations,
